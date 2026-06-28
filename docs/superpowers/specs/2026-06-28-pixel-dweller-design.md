@@ -71,6 +71,12 @@ Feel: calm, cozy, bite-sized; meaningful long-term progress.
 
 ## Phased delivery (each phase = a GitHub Pages release)
 
+### Phase 0 — Pipeline (set up BEFORE feature work)
+
+Repo + GUT test framework + both GitHub Actions workflows + branch protection, so
+the very first feature PR already runs the full pipeline. See "Development &
+Delivery Pipeline" below.
+
 ### Phase 1 — Foundation (FIRST SHIP) — scope of the upcoming impl plan
 
 Walkable house interior + yard; dual touch/keyboard movement, collision,
@@ -134,6 +140,58 @@ and growth thresholds are pure logic testable without UI.
 Town beyond the house/yard; NPCs; multi-element town evolution; lineage /
 generations / eras; day-night; advanced audio; ads/IAP; dialogue; mini-games;
 Google Maps world-generation.
+
+## Development & Delivery Pipeline
+
+Ship cycle per task: **task -> branch -> dev (TDD) -> thorough test -> PR -> merge
+to main -> GitHub Actions ships to Pages.** `main` is always deployable and always
+the deployed build.
+
+### Per-task cycle
+
+1. **Task** — one small vertical slice from the plan.
+2. **Branch** — `feat/<task>` off `main`.
+3. **Dev (TDD)** — write GUT tests first, implement until green.
+4. **Verify locally** — headless tests + boot smoke + web-export smoke.
+5. **PR** — opens PR; CI runs all gates; a preview build deploys; lead reviews
+   in-thread.
+6. **Merge** — when CI is green, squash-merge to `main` (self-merge allowed).
+7. **Ship** — merge to `main` triggers deploy workflow -> HTML5 export -> Pages.
+
+### Test layers (what "thoroughly tested" means)
+
+| Layer | Scope | Tooling | When |
+|-------|-------|---------|------|
+| L1 Unit | Pure logic: decay, care-score, stage thresholds, save/load round-trip | GUT, headless | every push |
+| L2 Scene/integration | Scenes instantiate, signals wire, player moves + collides (simulated input) | GUT + headless scene load | every push |
+| L3 Boot smoke | Project boots headless, runs N frames, exits 0 | `godot --headless` | every push |
+| L4 Export sanity | HTML5 export succeeds; `.wasm/.pck/.html` present + sane size | Godot export in CI | every PR |
+| L5 Manual visual | Feel, art, touch on a real device | checklist + PR preview deploy | visual PRs |
+
+Logic is kept in UI-free scripts (`Dweller.gd`, `TimeManager.gd`, `SaveManager.gd`)
+so L1 covers the important behavior cheaply and deterministically.
+
+### GitHub Actions
+
+- **`ci.yml`** (on PR, all required to pass): `gdlint` + `gdformat --check`
+  (gdtoolkit); GUT suite (L1+L2); headless boot smoke (L3); trial HTML5 export
+  (L4); **deploy a per-PR preview build** (artifact or preview Pages path) for L5
+  click-testing before merge.
+- **`deploy.yml`** (on push to `main`): non-threaded HTML5 export; deploy to
+  GitHub Pages -> live URL.
+- Godot in CI via the `barichello/godot-ci` headless image + export templates,
+  with caching.
+
+### Branch protection (merge gate)
+
+`main` accepts PRs only (no direct pushes); **green CI is required**; self-merge
+allowed (CI-only gate); lead reviews each PR in-thread, including every worker
+(opencode/hermes) PR. Squash merge for linear history.
+
+### Definition of Done (per task)
+
+New logic has tests; all relevant layers pass (L5 for visual PRs); CI green;
+reviewed. No green CI -> no merge -> no ship.
 
 ## Verification (Phase 1)
 
