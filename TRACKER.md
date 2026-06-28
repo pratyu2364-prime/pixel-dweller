@@ -15,7 +15,7 @@ escalation_worker: hermes/grok        # used after 2 failed attempts
 reviewer: claude         # only Claude reviews/merges
 retry_cap: 2             # attempts before escalating model
 date: 2026-06-28
-tasks_merged_today: 5
+tasks_merged_today: 6
 ```
 
 ## Legend
@@ -36,11 +36,12 @@ tasks_merged_today: 5
 | P1-3 | 1 | Needs + real-time decay | done | — | — | 0 | pure logic |
 | P1-4 | 1 | Save/load + elapsed time | done | — | — | 0 | IndexedDB on web |
 | P1-5 | 1 | Care actions + UI | done | — | — | 0 | bars + buttons |
-| P1-6 | 1 | Life stages + growth | todo | — | — | 0 | Baby→Kid→Adult |
+| P1-6 | 1 | Life stages + growth | done | — | — | 0 | Baby→Kid→Adult |
 | P1-7 | 1 | World-change on growth | todo | — | — | 0 | the novelty seed |
 | P1-8 | 1 | Polish + first ship | todo | — | — | 0 | title+settings+credits |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-06-28 23:20:22 — P1-6 → done — worker big-pickle; Stage enum + care_score + grew_up signal + neglect; 6 tests
 - 2026-06-28 23:14:32 — P1-5 → done — worker big-pickle; care UI (bars+Eat/Rest/Play), decay+save wired; lead fixed Variant-inference in UI.gd + SaveManager.gd
 - 2026-06-28 23:02:49 — P1-4 → done — worker big-pickle; SaveManager+TimeManager, offline-decay timestamp; 5 tests
 - 2026-06-28 22:58:09 — P1-3 → done — worker big-pickle; Dweller pure-logic needs+decay; 6 tests
