@@ -13,7 +13,7 @@ jobs:
     name: Lint + Test + Export smoke
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.3.0
+      image: barichello/godot-ci:4.3
     steps:
       - uses: actions/checkout@v4
 
@@ -25,10 +25,13 @@ jobs:
             gdlint scripts/ || (echo "::warning::gdlint issues" && true)
           fi
 
+      - name: Import resources (registers GUT class_names)
+        run: timeout 180 godot --headless --import || true
+
       - name: GUT unit tests (headless)
         run: |
           if [ -d addons/gut ]; then
-            godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
+            timeout 240 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
           else
             echo "GUT not present yet — skipping (Phase 0)."
           fi
@@ -39,6 +42,13 @@ jobs:
           if grep -iE "SCRIPT ERROR|Parse Error|ERROR: " boot.log; then
             echo "::error::boot produced errors"; exit 1
           fi
+
+      - name: Provision export templates (container HOME fix)
+        run: |
+          TDIR="$HOME/.local/share/godot/export_templates/4.3.stable"
+          mkdir -p "$TDIR"
+          cp -rn /root/.local/share/godot/export_templates/4.3.stable/. "$TDIR/" 2>/dev/null || true
+          ls "$TDIR" 2>/dev/null | head || echo "no templates found in image"
 
       - name: Trial HTML5 export (non-threaded)
         run: |
