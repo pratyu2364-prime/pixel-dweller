@@ -43,6 +43,13 @@ jobs:
             echo "::error::boot produced errors"; exit 1
           fi
 
+      - name: Provision export templates (container HOME fix)
+        run: |
+          TDIR="$HOME/.local/share/godot/export_templates/4.3.stable"
+          mkdir -p "$TDIR"
+          cp -rn /root/.local/share/godot/export_templates/4.3.stable/. "$TDIR/" 2>/dev/null || true
+          ls "$TDIR" 2>/dev/null | head || echo "no templates found in image"
+
       - name: Trial HTML5 export (non-threaded)
         run: |
           mkdir -p build/web
