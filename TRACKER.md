@@ -15,7 +15,7 @@ escalation_worker: hermes/grok        # used after 2 failed attempts
 reviewer: claude         # only Claude reviews/merges
 retry_cap: 2             # attempts before escalating model
 date: 2026-06-28
-tasks_merged_today: 7
+tasks_merged_today: 8
 ```
 
 ## Legend
@@ -38,9 +38,10 @@ tasks_merged_today: 7
 | P1-5 | 1 | Care actions + UI | done | — | — | 0 | bars + buttons |
 | P1-6 | 1 | Life stages + growth | done | — | — | 0 | Baby→Kid→Adult |
 | P1-7 | 1 | World-change on growth | done | — | — | 0 | the novelty seed |
-| P1-8 | 1 | Polish + first ship | todo | — | — | 0 | title+settings+credits |
+| P1-8 | 1 | Polish + first ship | done | — | — | 0 | title+settings+credits |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-06-28 23:34:09 — P1-8 → done — worker big-pickle; Title+Settings+credits+stage label; Phase 1 COMPLETE; 3 tests
 - 2026-06-28 23:28:02 — P1-7 → done — worker big-pickle; THE NOVELTY: growth adds persistent world decorations (tree@Kid, flowers@Adult); 4 tests
 - 2026-06-28 23:20:22 — P1-6 → done — worker big-pickle; Stage enum + care_score + grew_up signal + neglect; 6 tests
 - 2026-06-28 23:14:32 — P1-5 → done — worker big-pickle; care UI (bars+Eat/Rest/Play), decay+save wired; lead fixed Variant-inference in UI.gd + SaveManager.gd

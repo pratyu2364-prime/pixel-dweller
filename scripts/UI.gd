@@ -11,6 +11,7 @@ var dweller: Dweller
 @onready var eat_button: Button = $Margin/VBox/Buttons/Eat
 @onready var rest_button: Button = $Margin/VBox/Buttons/Rest
 @onready var play_button: Button = $Margin/VBox/Buttons/Play
+@onready var stage_label: Label = $Margin/VBox/StageLabel
 
 var _autosave_timer: float = 0.0
 
@@ -27,6 +28,7 @@ func _ready() -> void:
 
 	var world: Node2D = get_node("../World")
 	world.apply_world_stage(dweller.stage)
+	stage_label.text = _stage_name(dweller.stage)
 
 	eat_button.pressed.connect(_on_eat_pressed)
 	rest_button.pressed.connect(_on_rest_pressed)
@@ -67,3 +69,16 @@ func _save() -> void:
 func _on_dweller_grew_up(new_stage: int) -> void:
 	var world: Node2D = get_node("../World")
 	world.apply_world_stage(new_stage)
+	stage_label.text = _stage_name(new_stage)
+
+
+func _stage_name(stage: int) -> String:
+	match stage:
+		Dweller.Stage.BABY:
+			return "Baby"
+		Dweller.Stage.KID:
+			return "Kid"
+		Dweller.Stage.ADULT:
+			return "Adult"
+		_:
+			return ""
