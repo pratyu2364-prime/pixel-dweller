@@ -14,8 +14,18 @@ func _ready() -> void:
 	var sf := SpriteFrames.new()
 	sf.add_animation("idle")
 	sf.add_animation("walk")
+	var tex := _placeholder_texture()
+	sf.add_frame("idle", tex)
+	sf.add_frame("walk", tex)
 	$AnimatedSprite2D.sprite_frames = sf
 	$AnimatedSprite2D.play("idle")
+
+
+## Placeholder dweller sprite until real CC0 art lands (a tan square).
+func _placeholder_texture() -> ImageTexture:
+	var img := Image.create(20, 24, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.95, 0.8, 0.45))
+	return ImageTexture.create_from_image(img)
 
 
 func _physics_process(_delta: float) -> void:

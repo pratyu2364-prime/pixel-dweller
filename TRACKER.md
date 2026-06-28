@@ -15,7 +15,7 @@ escalation_worker: hermes/grok        # used after 2 failed attempts
 reviewer: claude         # only Claude reviews/merges
 retry_cap: 2             # attempts before escalating model
 date: 2026-06-28
-tasks_merged_today: 0
+tasks_merged_today: 2
 ```
 
 ## Legend
@@ -31,8 +31,8 @@ tasks_merged_today: 0
 | P0-3 | 0 | CI workflow | done | — | — | 0 | tests+export+preview |
 | P0-4 | 0 | Deploy workflow | done | — | — | 0 | Pages on main |
 | P0-5 | 0 | Driver + cron dry-run | done | — | — | 0 | loop picks next task |
-| P1-1 | 1 | Player movement (touch+keys) | todo | — | — | 0 | depends P0 |
-| P1-2 | 1 | World TileMap + collision | todo | — | — | 0 | depends P1-1 |
+| P1-1 | 1 | Player movement (touch+keys) | done | — | — | 0 | depends P0 |
+| P1-2 | 1 | World + collision + camera | done | — | — | 0 | depends P1-1 |
 | P1-3 | 1 | Needs + real-time decay | todo | — | — | 0 | pure logic |
 | P1-4 | 1 | Save/load + elapsed time | todo | — | — | 0 | IndexedDB on web |
 | P1-5 | 1 | Care actions + UI | todo | — | — | 0 | bars + buttons |
@@ -41,6 +41,8 @@ tasks_merged_today: 0
 | P1-8 | 1 | Polish + first ship | todo | — | — | 0 | title+settings+credits |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-06-28 22:54:49 — P1-2 → done — worker big-pickle; walkable room+camera; lead added visible placeholder sprite; player wired into Main
+- 2026-06-28 22:46:59 — P1-1 → done (att 1) PR#3 — worker big-pickle; lead fixed sprite_frames + added scene test; merged+shipped
 
 - 2026-06-28 — tracker created; harness being stood up by lead (Claude).
 
