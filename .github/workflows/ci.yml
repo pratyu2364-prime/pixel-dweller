@@ -25,10 +25,13 @@ jobs:
             gdlint scripts/ || (echo "::warning::gdlint issues" && true)
           fi
 
+      - name: Import resources (registers GUT class_names)
+        run: timeout 180 godot --headless --import || true
+
       - name: GUT unit tests (headless)
         run: |
           if [ -d addons/gut ]; then
-            godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
+            timeout 240 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
           else
             echo "GUT not present yet — skipping (Phase 0)."
           fi
