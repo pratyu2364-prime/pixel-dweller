@@ -15,7 +15,7 @@ escalation_worker: hermes/grok        # used after 2 failed attempts
 reviewer: claude         # only Claude reviews/merges
 retry_cap: 2             # attempts before escalating model
 date: 2026-06-28
-tasks_merged_today: 3
+tasks_merged_today: 4
 ```
 
 ## Legend
@@ -34,13 +34,14 @@ tasks_merged_today: 3
 | P1-1 | 1 | Player movement (touch+keys) | done | — | — | 0 | depends P0 |
 | P1-2 | 1 | World + collision + camera | done | — | — | 0 | depends P1-1 |
 | P1-3 | 1 | Needs + real-time decay | done | — | — | 0 | pure logic |
-| P1-4 | 1 | Save/load + elapsed time | todo | — | — | 0 | IndexedDB on web |
+| P1-4 | 1 | Save/load + elapsed time | done | — | — | 0 | IndexedDB on web |
 | P1-5 | 1 | Care actions + UI | todo | — | — | 0 | bars + buttons |
 | P1-6 | 1 | Life stages + growth | todo | — | — | 0 | Baby→Kid→Adult |
 | P1-7 | 1 | World-change on growth | todo | — | — | 0 | the novelty seed |
 | P1-8 | 1 | Polish + first ship | todo | — | — | 0 | title+settings+credits |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-06-28 23:02:49 — P1-4 → done — worker big-pickle; SaveManager+TimeManager, offline-decay timestamp; 5 tests
 - 2026-06-28 22:58:09 — P1-3 → done — worker big-pickle; Dweller pure-logic needs+decay; 6 tests
 - 2026-06-28 22:54:49 — P1-2 → done — worker big-pickle; walkable room+camera; lead added visible placeholder sprite; player wired into Main
 - 2026-06-28 22:46:59 — P1-1 → done (att 1) PR#3 — worker big-pickle; lead fixed sprite_frames + added scene test; merged+shipped
