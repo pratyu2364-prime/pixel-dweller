@@ -1,0 +1,22 @@
+# Pixel Dweller — vibe-loop config (read by the `ship` + `align` skills)
+# Legacy layout: TRACKER.md + tasks/ live at repo root (ship falls back to them).
+
+intervention: autopilot          # near-zero: self-merge on green CI, no approvals
+reviewer: claude
+workers: [opencode/big-pickle, hermes/grok]   # codegen, in escalation order
+
+commands:                        # stack-specific; ship runs these locally pre-PR
+  test: "$HOME/.local/bin/godot --headless --path . --import && $HOME/.local/bin/godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit"
+  lint: "gdlint scripts/ || true"
+  build: ""                      # web export handled by deploy.yml on merge
+
+gates:
+  approve_plan: false
+  approve_merge: false
+  approve_deploy: false
+
+limits:
+  retry_cap: 2
+  max_tasks_per_run: 8
+
+paused: false
