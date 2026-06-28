@@ -26,6 +26,7 @@ static func save_dweller(dweller: Dweller, path: String = "user://save.json") ->
 		"hunger": dweller.hunger,
 		"energy": dweller.energy,
 		"mood": dweller.mood,
+		"stage": dweller.stage,
 	}
 	save(data, path)
 
@@ -40,6 +41,8 @@ static func load_into_dweller(dweller: Dweller, path: String = "user://save.json
 		dweller.energy = data["energy"]
 	if data.has("mood"):
 		dweller.mood = data["mood"]
+	if data.has("stage"):
+		dweller.stage = data["stage"]
 	if data.has("last_saved_at"):
 		return data["last_saved_at"]
 	return 0.0

@@ -23,6 +23,11 @@ func _ready() -> void:
 		if elapsed > 0.0:
 			dweller.apply_elapsed(elapsed)
 
+	dweller.grew_up.connect(_on_dweller_grew_up)
+
+	var world: Node2D = get_node("../World")
+	world.apply_world_stage(dweller.stage)
+
 	eat_button.pressed.connect(_on_eat_pressed)
 	rest_button.pressed.connect(_on_rest_pressed)
 	play_button.pressed.connect(_on_play_pressed)
@@ -57,3 +62,8 @@ func _on_play_pressed() -> void:
 
 func _save() -> void:
 	SaveManager.save_dweller(dweller, SAVE_PATH)
+
+
+func _on_dweller_grew_up(new_stage: int) -> void:
+	var world: Node2D = get_node("../World")
+	world.apply_world_stage(new_stage)
