@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: "4.3"
+
+jobs:
+  test:
+    name: Lint + Test + Export smoke
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint (gdtoolkit)
+        run: |
+          pip install --quiet "gdtoolkit==4.*" || true
+          if compgen -G "scripts/**/*.gd" > /dev/null; then
+            gdformat --check scripts/ || (echo "::warning::gdformat issues" && true)
+            gdlint scripts/ || (echo "::warning::gdlint issues" && true)
+          fi
+
+      - name: GUT unit tests (headless)
+        run: |
+          if [ -d addons/gut ]; then
+            godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
+          else
+            echo "GUT not present yet — skipping (Phase 0)."
+          fi
+
+      - name: Boot smoke (headless, N frames)
+        run: |
+          timeout 30 godot --headless --path . --quit-after 120 2>&1 | tee boot.log || true
+          if grep -iE "SCRIPT ERROR|Parse Error|ERROR: " boot.log; then
+            echo "::error::boot produced errors"; exit 1
+          fi
+
+      - name: Trial HTML5 export (non-threaded)
+        run: |
+          mkdir -p build/web
+          if [ -f export_presets.cfg ]; then
+            godot --headless --path . --export-release "Web" build/web/index.html
+            test -f build/web/index.html && test -f build/web/index.wasm
+          else
+            echo "No export_presets.cfg yet — skipping (Phase 0)."
+          fi
+
+      - name: Upload PR preview build
+        if: hashFiles('build/web/index.html') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-preview-pr-${{ github.event.pull_request.number }}
+          path: build/web
+          retention-days: 7

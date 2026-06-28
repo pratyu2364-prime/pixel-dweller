@@ -1,0 +1,46 @@
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3.0
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Export HTML5 (non-threaded, Pages-safe)
+        run: |
+          mkdir -p build/web
+          if [ -f export_presets.cfg ]; then
+            godot --headless --path . --export-release "Web" build/web/index.html
+          else
+            echo "<h1>Pixel Dweller — coming soon</h1>" > build/web/index.html
+          fi
+          # GitHub Pages serves index.html by default; ensure no Jekyll processing
+          touch build/web/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
