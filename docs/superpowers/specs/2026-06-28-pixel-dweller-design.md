@@ -42,8 +42,8 @@ a civilization the town remembers. No battling. No ads/IAP. Offline. No accounts
    + yard (Phase 1); town added Phase 2. Camera follows player. Tile collision.
 3. **Care:** interact with the dweller -> 3 need bars (Hunger/Energy/Mood) refill
    via actions (Eat/Rest/Play). Needs decay in real wall-clock time.
-4. **While away:** decay computed on next open; local notification when a need is
-   predicted low.
+4. **While away:** decay computed on next open from the saved timestamp (no
+   notifications on web).
 5. **Growth payoff:** accumulated good care advances life stage
    (Baby -> Kid -> Adult) with an animation, AND triggers a permanent world change
    (Phase 1: one element, e.g. a tree blooms / area recolors).
@@ -153,7 +153,7 @@ Google Maps world-generation.
 ## Build / delegation plan
 
 - **Lead (Claude):** architecture, decay/care-score/stage/world-change logic, code
-  review, integration, Play Store guidance.
+  review, integration, HTML5 export + GitHub Pages deploy guidance.
 - **Workers (opencode / hermes):** Godot scene boilerplate, movement/UI wiring,
   CC0 asset hookup, repetitive scripts — handed tight specs, output reviewed.
 - **User:** install Godot 4.3+, run in browser, taste feedback, create the GitHub
