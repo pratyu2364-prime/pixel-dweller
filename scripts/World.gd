@@ -11,6 +11,7 @@ func _ready() -> void:
 	add_child(player)
 
 	var camera := Camera2D.new()
+	camera.zoom = Vector2(3.5, 3.5)  # GB-style chunky pixels; character fills the view
 	camera.position_smoothing_enabled = true
 	player.add_child(camera)
 
