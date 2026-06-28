@@ -15,7 +15,7 @@ static func load(path: String = "user://save.json") -> Dictionary:
 	var text := file.get_as_text()
 	if text.is_empty():
 		return {}
-	var result := JSON.parse_string(text)
+	var result: Variant = JSON.parse_string(text)
 	if typeof(result) != TYPE_DICTIONARY:
 		return {}
 	return result
