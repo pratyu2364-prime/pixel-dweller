@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
+[ext_resource type="Texture2D" path="res://assets/character/ninja_blue.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(16, 16)
+size = Vector2(12, 10)
 
 [sub_resource type="RectangleShape2D" id="2"]
 size = Vector2(64, 64)
@@ -14,17 +15,19 @@ size = Vector2(64, 64)
 [sub_resource type="RectangleShape2D" id="4"]
 size = Vector2(64, 64)
 
-[sub_resource type="RectangleShape2D" id="5"]
-size = Vector2(64, 64)
-
 [node name="Player" type="CharacterBody2D"]
-collision_mask = 0
 script = ExtResource("1_player")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("1")
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(2, 2)
+texture = ExtResource("2_tex")
+hframes = 4
+vframes = 7
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 6)
+shape = SubResource("1")
 
 [node name="TouchDPad" type="Control" parent="."]
 anchor_left = 0.0
@@ -53,5 +56,5 @@ action = "move_left"
 
 [node name="BtnRight" type="TouchScreenButton" parent="TouchDPad"]
 position = Vector2(144, 72)
-shape = SubResource("5")
+shape = SubResource("4")
 action = "move_right"

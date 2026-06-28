@@ -1,36 +1,31 @@
 extends CharacterBody2D
 
-@export var speed: float = 100.0
+@export var speed: float = 70.0
 
-## Pure function: maps raw input vector (from keyboard or touch) to
-## normalized movement direction. Unit-testable without a running scene.
+## Ninja Adventure sprite sheet layout (sprite.png 64x112, 16x16 frames):
+## columns = direction, rows = animation frame. Walk cycle = rows 0..3.
+const COL_DOWN := 0
+const COL_UP := 1
+const COL_LEFT := 2
+const COL_RIGHT := 3
+const WALK_ROWS := [0, 1, 2, 3]
+const ANIM_FPS := 8.0
+
+var _facing_col: int = COL_DOWN
+var _anim_t: float = 0.0
+
+@onready var sprite: Sprite2D = $Sprite
+
+
+## Pure function: raw input vector -> normalized direction. Unit-testable.
 static func input_to_direction(input_vec: Vector2) -> Vector2:
 	if input_vec.length_squared() == 0.0:
 		return Vector2.ZERO
 	return input_vec.normalized()
 
 
-func _ready() -> void:
-	var sf := SpriteFrames.new()
-	sf.add_animation("idle")
-	sf.add_animation("walk")
-	var tex := _placeholder_texture()
-	sf.add_frame("idle", tex)
-	sf.add_frame("walk", tex)
-	$AnimatedSprite2D.sprite_frames = sf
-	$AnimatedSprite2D.play("idle")
-
-
-## Placeholder dweller sprite until real CC0 art lands (a tan square).
-func _placeholder_texture() -> ImageTexture:
-	var img := Image.create(20, 24, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0.95, 0.8, 0.45))
-	return ImageTexture.create_from_image(img)
-
-
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var input_dir := Vector2.ZERO
-
 	if Input.is_action_pressed("move_up"):
 		input_dir.y -= 1.0
 	if Input.is_action_pressed("move_down"):
@@ -42,15 +37,21 @@ func _physics_process(_delta: float) -> void:
 
 	var direction := input_to_direction(input_dir)
 	velocity = direction * speed
-	_update_animation(direction)
 	move_and_slide()
+	_update_sprite(direction, delta)
 
 
-func _update_animation(direction: Vector2) -> void:
-	var anim := $AnimatedSprite2D as AnimatedSprite2D
+func _update_sprite(direction: Vector2, delta: float) -> void:
 	if direction == Vector2.ZERO:
-		anim.play("idle")
+		_anim_t = 0.0
+		sprite.frame_coords = Vector2i(_facing_col, WALK_ROWS[0])
+		return
+
+	if absf(direction.x) > absf(direction.y):
+		_facing_col = COL_RIGHT if direction.x > 0.0 else COL_LEFT
 	else:
-		anim.play("walk")
-		if direction.x != 0.0:
-			anim.flip_h = direction.x < 0.0
+		_facing_col = COL_DOWN if direction.y > 0.0 else COL_UP
+
+	_anim_t += delta * ANIM_FPS
+	var row: int = WALK_ROWS[int(_anim_t) % WALK_ROWS.size()]
+	sprite.frame_coords = Vector2i(_facing_col, row)

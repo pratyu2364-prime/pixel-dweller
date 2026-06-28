@@ -8,9 +8,12 @@ func test_scene_instantiates_without_error() -> void:
 	var p := PlayerScene.instantiate()
 	add_child_autofree(p)
 	await get_tree().process_frame
-	assert_not_null(p.get_node_or_null("AnimatedSprite2D"), "has AnimatedSprite2D")
+	var spr := p.get_node_or_null("Sprite") as Sprite2D
+	assert_not_null(spr, "has Sprite2D")
+	assert_not_null(spr.texture, "sprite has a real texture")
+	assert_eq(spr.hframes, 4, "4 direction columns")
+	assert_eq(spr.vframes, 7, "7 frame rows")
 	assert_not_null(p.get_node_or_null("TouchDPad"), "has touch d-pad")
-	assert_not_null((p.get_node("AnimatedSprite2D") as AnimatedSprite2D).sprite_frames, "sprite_frames set in _ready")
 
 
 func test_up() -> void:
