@@ -1,60 +1,97 @@
-# Pixel Dweller — Design Spec (v1)
+# Pixel Dweller — Design Spec
 
 **Date:** 2026-06-28
-**Status:** Approved for planning
-**Type:** 2D life-simulation mobile game (Android / Google Play)
+**Status:** Vision approved; Phase 1 ready for planning
+**Type:** 2D top-down generational life-sim (Web / HTML5, hosted on GitHub Pages)
 
 ## Context
 
-A beginner developer wants a fun, *production-grade*, Play-Store-shippable 2D
-life-sim game, buildable over a few weekends. To keep scope realistic, v1 is a
-tight, cozy Tamagotchi-style care loop — not a Sims clone. Two AI helper agents
-(hermes, opencode) independently converged on the same shape: Godot 4, a single
-dweller, quick-tap care sessions, real-time decay. This spec captures the agreed
-v1. Implementation will be led by the senior engineer (Claude), delegating
-boilerplate to hermes/opencode to conserve premium tokens.
+A beginner developer is building this game for his sister to play, hosted on
+GitHub Pages and playable in any mobile or desktop browser via a link. The vision
+grew from a single-room Tamagotchi into a walkable, Pokemon-style (Game Boy/DS)
+cozy life-sim with a novel hook. Two AI helper agents (hermes, opencode)
+independently converged on the novelty: **the world grows as the dweller grows**,
+extended to a generational lineage. To keep this achievable, the single vision is
+delivered in shippable phases. The senior engineer (Claude) leads; boilerplate is
+delegated to hermes/opencode to conserve premium tokens.
 
-## Concept
+NOTE: Target is web (not an app store). No developer fees, no store review — just
+a GitHub Pages URL to share.
 
-Raise one pixel dweller from baby to adult by keeping its needs healthy in real
-time. Cozy, bite-sized, offline-friendly, portrait mobile. No ads, no IAP, no
-internet, no accounts.
+## Vision
+
+A cozy, walkable top-down town. You raise a pixel dweller from baby to adult in
+real time; **caring for them visibly transforms the town**. At adulthood you
+retire the dweller and a new baby begins a new era — across generations you build
+a civilization the town remembers. No battling. No ads/IAP. Offline. No accounts.
+
+### The novelty (why it's fresh)
+
+- **Care shapes the world** (hermes): the dweller's growth permanently rewrites
+  the town — paths bloom, interiors recolor, ambiance evolves — making the world a
+  co-authored memory of how you cared.
+- **Lineage across generations** (opencode): each life stage grows the town; at
+  adulthood you retire and start a new generation in a new era; NPCs and town
+  persist and evolve. You play a lineage, not a single life.
 
 ## Player experience (end to end)
 
-1. **First launch:** title screen -> "Adopt" -> baby sprite appears in a room ->
-   3-tap tutorial -> straight into play. No login/paywall.
-2. **Main screen (portrait):** dweller idle-animating in room (top); 3 need bars
-   (middle); 3 action buttons Eat/Rest/Play (bottom); stage badge (corner).
-3. **Session (~60s):** tap actions -> need bars refill with animation + sound ->
-   dweller looks content -> close app.
-4. **While away:** needs decay in wall-clock time (computed on next open). A local
-   notification fires when a need is predicted low: "I'm getting hungry!".
-5. **Return:** app computes elapsed time, applies decay, shows mood-appropriate
-   sprite + gentle welcome. No death/punishment in v1 — forgiving.
-6. **Payoff:** accumulated good care triggers a growth animation:
-   Baby -> Kid -> Adult. The v1 "win" is raising them well.
+1. **First launch:** title -> "Begin" -> baby dweller appears in your house ->
+   short tutorial (move, care) -> play. No login/paywall.
+2. **Roam:** top-down, walk with on-screen d-pad/joystick (touch). House interior
+   + yard (Phase 1); town added Phase 2. Camera follows player. Tile collision.
+3. **Care:** interact with the dweller -> 3 need bars (Hunger/Energy/Mood) refill
+   via actions (Eat/Rest/Play). Needs decay in real wall-clock time.
+4. **While away:** decay computed on next open; local notification when a need is
+   predicted low.
+5. **Growth payoff:** accumulated good care advances life stage
+   (Baby -> Kid -> Adult) with an animation, AND triggers a permanent world change
+   (Phase 1: one element, e.g. a tree blooms / area recolors).
+6. **Lineage (Phase 3):** at Adult you may retire -> new baby, new era; town
+   carries forward and keeps evolving.
 7. **Settings:** sound on/off, notifications on/off, credits (Kenney attribution).
 
-Feel: calm, not stressful; bite-sized, not grindy. A 2026 Tamagotchi — open a few
-times a day for 30 seconds, watch a life grow over a week.
+Feel: calm, cozy, bite-sized; meaningful long-term progress.
 
 ## Stack
 
-- **Engine:** Godot 4 (GDScript) — free, no royalties, one-click Android APK.
-- **Art:** Kenney.nl CC0 packs (character, room/furniture, UI). Legal to sell, no
-  attribution required (credited as courtesy).
-- **Platform:** Android, portrait, offline. Free app.
-  - NOTE: Google Play Console requires a one-time **$25 developer account fee**.
-- **Persistence:** local JSON at `user://save.json`. No server, no accounts.
+- **Engine:** Godot 4.3+ (GDScript).
+- **Export:** HTML5 / WebAssembly, **non-threaded (single-threaded) web build** so
+  it runs on GitHub Pages, which cannot set the COOP/COEP headers a threaded build
+  would require. This is a hard config requirement.
+- **Hosting:** GitHub Pages (free). Shared as a URL; playable in mobile + desktop
+  browsers. No install.
+- **Art:** Kenney.nl CC0 packs (top-down character + tiles, UI).
+- **Controls:** dual input — on-screen touch d-pad/joystick (mobile) AND
+  WASD/arrow keys (desktop), same build.
+- **Persistence:** browser storage — Godot maps `user://save.json` to IndexedDB
+  per device/browser. No server/accounts.
+- **Notifications:** none in the web build (mobile browsers cannot fire them
+  reliably). Real-time decay is preserved via saved-timestamp computation on load.
 
-## Core loop
+## Phased delivery (each phase = a GitHub Pages release)
 
-Open -> see dweller + needs -> tap actions to refill needs (earns care score) ->
-good care over real days advances life stage, neglect slows it -> notification
-pulls player back when a need is low -> repeat.
+### Phase 1 — Foundation (FIRST SHIP) — scope of the upcoming impl plan
 
-## Mechanics
+Walkable house interior + yard; dual touch/keyboard movement, collision,
+camera-follow; the dweller lives in the house; 3 needs with real-time decay; care
+actions; Baby -> Kid -> Adult growth; ONE permanent world change at a growth
+milestone; save/load (browser storage); title + settings. Exported to HTML5 and
+deployed to GitHub Pages.
+
+Builds every foundation later phases need: tilemap, movement, save, needs, growth.
+
+### Phase 2 — Living town
+
+Roamable town (several buildings, 2-3 NPCs) beyond the house; each life stage
+evolves one town element. Adds: town map, NPC system, stage->world hooks.
+
+### Phase 3 — Lineage
+
+Retire-at-adult -> new generation in a new era; town persists and remembers across
+generations; NPCs age. Adds: generation/save-history system, era theming.
+
+## Mechanics (Phase 1)
 
 ### Need bars (0-100, real-time decay)
 
@@ -64,57 +101,60 @@ pulls player back when a need is low -> repeat.
 | Energy   | Rest        | slow       |
 | Mood     | Play        | fast       |
 
-### Real-time decay
-
-On app open (and on resume from background), compute elapsed seconds since
-`last_saved_at`, apply `decay_rate * elapsed` to each need, clamp to [0, 100].
-Schedule a local notification for the time a need is predicted to cross a "low"
-threshold.
+On app open/resume, compute elapsed seconds since `last_saved_at`, apply
+`decay_rate * elapsed`, clamp [0,100]. (No notifications in the web build; decay is
+fully driven by the saved timestamp.)
 
 ### Life stages
 
-Baby -> Kid -> Adult. Advance on accumulated **care score**
-(roughly: average need-health integrated over real days). Bars hitting 0 reduce
-care score -> slower growth. No death in v1. Each stage = its own sprite set.
+Baby -> Kid -> Adult, advanced by accumulated **care score** (avg need-health
+integrated over real days). Bars hitting 0 reduce care score (slower growth).
+No death in v1. Each stage has its own sprite set. A growth event triggers a
+permanent world change.
 
-## Architecture (Godot scenes / scripts)
+## Architecture (Godot scenes / scripts, Phase 1)
 
-- `Main.tscn` — root; loads save, wires UI to Dweller, runs frame updates.
-- `Dweller.gd` — needs state, decay math, care score, stage logic. The "brain".
-  Pure logic, UI-independent (unit-testable).
-- `TimeManager.gd` — elapsed-time calc on open/resume; notification scheduling.
-- `SaveManager.gd` — load/save JSON to `user://save.json`.
-- `UI.tscn` / `UI.gd` — need bars, action buttons, stage badge, animations.
+- `Main.tscn` — root; loads save, owns world + UI, runs updates.
+- `World.tscn` — TileMap (house + yard), collision, spawn points, world-change
+  hooks (e.g. swappable tiles/objects toggled by growth).
+- `Player.gd` — dual input (touch d-pad + keyboard), 4-direction movement +
+  animation, collision.
+- `Dweller.gd` — needs state, decay math, care score, stage logic. Pure logic,
+  UI-independent (unit-testable).
+- `TimeManager.gd` — elapsed-time calc on open/resume from saved timestamp.
+- `SaveManager.gd` — load/save JSON to `user://save.json` (IndexedDB on web).
+- `UI.tscn` / `UI.gd` — need bars, action buttons, stage badge, touch d-pad.
 - `Settings.tscn` — sound/notifications toggles, credits.
 
-Each unit has one clear purpose and a defined interface; decay + care-score + save
-are pure logic testable without UI.
+Each unit has one clear purpose and a defined interface; decay, care-score, save,
+and growth thresholds are pure logic testable without UI.
 
-## v1 scope (ships)
+## Cut from Phase 1 (later phases)
 
-1 dweller; 3 needs; 3 actions; real-time decay; 3 life stages; save/load;
-1 predictive notification; 1 room background; title screen; settings (sound +
-notifications toggles); growth animation; mood-based sprite swaps.
+Town beyond the house/yard; NPCs; multi-element town evolution; lineage /
+generations / eras; day-night; advanced audio; ads/IAP; dialogue; mini-games;
+Google Maps world-generation.
 
-## Cut from v1 (phase 2+)
+## Verification (Phase 1)
 
-Google Maps world-generation; room decorating / furniture shop; coins economy;
-multiple dwellers; day/night cycle; advanced sound design; ads / IAP; dialogue;
-mini-games.
-
-## Verification
-
-- **Unit tests:** decay math, care-score accumulation, stage-transition
-  thresholds (Godot GUT or assert scenes). Pure-logic, no UI needed.
-- **Time simulation:** inject elapsed time in debug to fast-forward decay + growth.
-- **Manual:** set need high -> close -> reopen after N minutes -> confirm bar
-  dropped by expected amount; confirm notification fires; confirm stage advances.
-- **Device:** export debug APK -> run on phone/emulator -> full loop works.
+- **Unit tests:** decay math, care-score accumulation, stage thresholds (Godot
+  GUT or assert scenes). Pure logic, no UI.
+- **Time simulation:** inject elapsed time in debug to fast-forward decay/growth.
+- **Movement/collision:** manual walk test; cannot pass walls; camera follows.
+- **World change:** force a growth event -> confirm the permanent world change
+  applies and persists across save/reload.
+- **Manual decay:** need high -> close tab -> reopen after N min -> bar dropped as
+  expected (timestamp-driven).
+- **Cross-platform:** desktop browser (keyboard) and mobile browser (touch) both
+  play the full loop.
+- **Deploy:** HTML5 export served on GitHub Pages loads and runs (verify the
+  non-threaded build works without COOP/COEP headers).
 
 ## Build / delegation plan
 
-- **Lead (Claude):** architecture, decay/care-score/stage math, code review,
-  integration, Play Store guidance.
-- **Workers (opencode / hermes):** Godot scene boilerplate, UI wiring, CC0 asset
-  hookup, repetitive scripts — handed tight specs, output reviewed by lead.
-- **User:** install Godot, run on device, taste feedback, pay $25 at publish time.
+- **Lead (Claude):** architecture, decay/care-score/stage/world-change logic, code
+  review, integration, Play Store guidance.
+- **Workers (opencode / hermes):** Godot scene boilerplate, movement/UI wiring,
+  CC0 asset hookup, repetitive scripts — handed tight specs, output reviewed.
+- **User:** install Godot 4.3+, run in browser, taste feedback, create the GitHub
+  repo + enable Pages for hosting (free).
