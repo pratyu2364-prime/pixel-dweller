@@ -13,7 +13,7 @@ jobs:
     name: Lint + Test + Export smoke
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.3.0
+      image: barichello/godot-ci:4.3
     steps:
       - uses: actions/checkout@v4
 
