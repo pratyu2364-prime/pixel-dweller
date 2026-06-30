@@ -9,6 +9,7 @@ var _player: CharacterBody2D
 var _area_scenes: Dictionary = {
 	"house": "res://scenes/areas/House.tscn",
 	"garden": "res://scenes/areas/Garden.tscn",
+	"town": "res://scenes/areas/Town.tscn",
 }
 
 

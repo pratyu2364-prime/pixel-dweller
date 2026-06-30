@@ -42,11 +42,12 @@ tasks_merged_today: 8
 | P2-1 | 2 | Area framework + dynamic loading | done | big-pickle | #13 | 1 | House loaded via AreaManager; saves current_area |
 | P2-2 | 2 | Door transitions + Garden | done | big-pickle | #14 | 1 | walk-into-door + fade; House↔Garden |
 | P2-3 | 2 | Growth decor → Garden | done | big-pickle | #15 | 1 | per-area novelty; House clean |
-| P2-4 | 2 | Town area + door | todo | — | — | 0 | 3 areas reachable on foot |
+| P2-4 | 2 | Town area + door | done | big-pickle | #16 | 1 | 3 areas reachable on foot |
 | P2-5 | 2 | Town NPC greeting | todo | — | — | 0 | dialog + cooldown mood boost |
 | P2-6 | 2 | Phase 2 polish + ship | todo | — | — | 0 | area label; full tour; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-01 — P2-4 → done (att 1) PR#16 — worker big-pickle; Town area (distinct) + Garden↔Town doors; House↔Garden↔Town reachable on foot; current_area persists for town; 66 tests; round trip verified headless
 - 2026-07-01 — P2-3 → done (att 1) PR#15 — worker big-pickle; growth decor moved to Garden (scripts/Garden.gd); House has no apply_world_stage; stage re-applied on boot+transition so growth persists across areas; 59 tests; ADULT cross-area verified headless
 - 2026-07-01 — P2-2 → done (att 1) PR#14 — worker big-pickle; Door Area2D (walk-into-zone) + fade transition + Garden area; bidirectional House↔Garden; current_area saved on transition; 57 tests; boot+transition verified headless
 - 2026-07-01 — P2-1 → done (att 1) PR#13 — worker big-pickle; AreaManager + dynamic area loading, House→scenes/areas/House.tscn, current_area saved; lead fixed AreaContainer parent + removed orphan World.tscn; 43 tests; merged+shipped
