@@ -12,11 +12,15 @@ var dweller: Dweller
 @onready var rest_button: Button = $Margin/VBox/Buttons/Rest
 @onready var play_button: Button = $Margin/VBox/Buttons/Play
 @onready var stage_label: Label = $Margin/VBox/StageLabel
+@onready var dialog_label: Label = $Margin/VBox/DialogLabel
+@onready var talk_button: Button = $Margin/VBox/Buttons/Talk
+@onready var dialog_timer: Timer = $DialogTimer
 
 var _autosave_timer: float = 0.0
 
 
 func _ready() -> void:
+	dialog_timer.timeout.connect(_on_dialog_timer_timeout)
 	dweller = Dweller.new()
 	var last_saved: float = SaveManager.load_into_dweller(dweller, SAVE_PATH)
 	if last_saved > 0.0:
@@ -90,3 +94,17 @@ func _stage_name(stage: int) -> String:
 			return "Adult"
 		_:
 			return ""
+
+
+func show_dialog(text: String) -> void:
+	dialog_label.text = text
+	dialog_label.visible = true
+	dialog_timer.start()
+
+
+func set_talk_button_visible(visible: bool) -> void:
+	talk_button.visible = visible
+
+
+func _on_dialog_timer_timeout() -> void:
+	dialog_label.visible = false
