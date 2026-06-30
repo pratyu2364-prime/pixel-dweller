@@ -12,40 +12,40 @@ func after_each() -> void:
 
 
 func test_kid_decoration_appears_at_kid_stage() -> void:
-	var world := preload("res://scenes/World.tscn").instantiate()
-	add_child_autofree(world)
+	var house := preload("res://scenes/areas/House.tscn").instantiate()
+	add_child_autofree(house)
 	await get_tree().process_frame
 
-	world.apply_world_stage(Dweller.Stage.KID)
+	house.apply_world_stage(Dweller.Stage.KID)
 
-	var tree := world.get_node_or_null("TreeDecoration")
+	var tree := house.get_node_or_null("TreeDecoration")
 	assert_not_null(tree, "TreeDecoration exists at KID stage")
 	assert_true(tree is Polygon2D, "TreeDecoration is a Polygon2D")
 
 
 func test_adult_stage_shows_all_decorations() -> void:
-	var world := preload("res://scenes/World.tscn").instantiate()
-	add_child_autofree(world)
+	var house := preload("res://scenes/areas/House.tscn").instantiate()
+	add_child_autofree(house)
 	await get_tree().process_frame
 
-	world.apply_world_stage(Dweller.Stage.ADULT)
+	house.apply_world_stage(Dweller.Stage.ADULT)
 
-	var tree := world.get_node_or_null("TreeDecoration")
+	var tree := house.get_node_or_null("TreeDecoration")
 	assert_not_null(tree, "TreeDecoration exists at ADULT stage")
-	var flowers := world.get_node_or_null("FlowersDecoration")
+	var flowers := house.get_node_or_null("FlowersDecoration")
 	assert_not_null(flowers, "FlowersDecoration exists at ADULT stage")
 
 
 func test_apply_world_stage_idempotent() -> void:
-	var world := preload("res://scenes/World.tscn").instantiate()
-	add_child_autofree(world)
+	var house := preload("res://scenes/areas/House.tscn").instantiate()
+	add_child_autofree(house)
 	await get_tree().process_frame
 
-	world.apply_world_stage(Dweller.Stage.ADULT)
-	world.apply_world_stage(Dweller.Stage.ADULT)
+	house.apply_world_stage(Dweller.Stage.ADULT)
+	house.apply_world_stage(Dweller.Stage.ADULT)
 
 	var count: int = 0
-	for child in world.get_children():
+	for child in house.get_children():
 		if child is Polygon2D and child.name in ["TreeDecoration", "FlowersDecoration"]:
 			count += 1
 

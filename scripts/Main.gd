@@ -1,7 +1,11 @@
 extends Node2D
-## Root scene. Phase 0 placeholder — boots cleanly so CI smoke test passes.
-## Feature scenes (World, Player, UI) get wired in during Phase 1.
+
+@onready var area_container: Node2D = $AreaContainer
+
+var area_manager: AreaManager = AreaManager.new()
 
 
 func _ready() -> void:
 	print("Pixel Dweller booted.")
+	var saved_area: String = SaveManager.load_current_area()
+	area_manager.load_area(saved_area, "EntryDefault", area_container)

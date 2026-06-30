@@ -26,8 +26,7 @@ func _ready() -> void:
 
 	dweller.grew_up.connect(_on_dweller_grew_up)
 
-	var world: Node2D = get_node("../World")
-	world.apply_world_stage(dweller.stage)
+	_apply_stage_to_area(dweller.stage)
 	stage_label.text = _stage_name(dweller.stage)
 
 	eat_button.pressed.connect(_on_eat_pressed)
@@ -63,13 +62,22 @@ func _on_play_pressed() -> void:
 
 
 func _save() -> void:
-	SaveManager.save_dweller(dweller, SAVE_PATH)
+	var main := get_node("..") as Node
+	var area_manager: AreaManager = main.area_manager as AreaManager
+	SaveManager.save_dweller(dweller, SAVE_PATH, area_manager.current_area)
 
 
 func _on_dweller_grew_up(new_stage: int) -> void:
-	var world: Node2D = get_node("../World")
-	world.apply_world_stage(new_stage)
+	_apply_stage_to_area(new_stage)
 	stage_label.text = _stage_name(new_stage)
+
+
+func _apply_stage_to_area(stage: int) -> void:
+	var main := get_node("..") as Node
+	var area_manager: AreaManager = main.area_manager as AreaManager
+	var area_node: Node2D = area_manager.get_current_area_node()
+	if area_node != null and area_node.has_method("apply_world_stage"):
+		area_node.apply_world_stage(stage)
 
 
 func _stage_name(stage: int) -> String:
