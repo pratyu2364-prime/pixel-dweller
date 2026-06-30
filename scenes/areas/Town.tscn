@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/World.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/Door.tscn" id="2_door"]
+[ext_resource type="PackedScene" path="res://scenes/Npc.tscn" id="3_npc"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(32, 1500)
@@ -63,3 +64,7 @@ position = Vector2(-500, 80)
 position = Vector2(-500, 0)
 target_area = "garden"
 target_entry = "EntryFromTownGarden"
+
+[node name="FriendlyNpc" parent="." instance=ExtResource("3_npc")]
+position = Vector2(250, -250)
+greeting = "Hey there! Lovely day for a stroll!"
