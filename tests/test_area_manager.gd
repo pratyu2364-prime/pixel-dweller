@@ -63,11 +63,11 @@ func test_get_current_area_node_returns_area() -> void:
 	var container := Node2D.new()
 	add_child_autofree(container)
 
-	mgr.load_area("house", "EntryDefault", container)
+	mgr.load_area("garden", "EntryFromHouse", container)
 
 	var area_node := mgr.get_current_area_node()
 	assert_not_null(area_node, "current area node exists")
-	assert_true(area_node.has_method("apply_world_stage"), "area has apply_world_stage")
+	assert_true(area_node.has_method("apply_world_stage"), "garden area has apply_world_stage")
 
 
 func test_save_load_round_trips_current_area() -> void:
