@@ -1,23 +1,17 @@
 extends GutTest
 
 
-func test_world_has_walls_player_and_spawn() -> void:
-	var world := preload("res://scenes/World.tscn").instantiate()
-	add_child_autofree(world)
+func test_house_has_walls_and_entry() -> void:
+	var house := preload("res://scenes/areas/House.tscn").instantiate()
+	add_child_autofree(house)
 	await get_tree().process_frame
 
 	var static_bodies := []
-	for child in world.get_children():
+	for child in house.get_children():
 		if child is StaticBody2D:
 			static_bodies.append(child)
-	assert_gt(static_bodies.size(), 3, "World has >= 4 StaticBody2D walls")
+	assert_gt(static_bodies.size(), 3, "House has >= 4 StaticBody2D walls")
 
-	var players := []
-	for child in world.get_children():
-		if child is CharacterBody2D:
-			players.append(child)
-	assert_eq(players.size(), 1, "World has player (CharacterBody2D)")
-
-	var spawn := world.get_node_or_null("Spawn")
-	assert_not_null(spawn, "World has Marker2D named Spawn")
-	assert_true(spawn is Marker2D, "Spawn is a Marker2D")
+	var entry := house.get_node_or_null("EntryDefault")
+	assert_not_null(entry, "House has Marker2D named EntryDefault")
+	assert_true(entry is Marker2D, "EntryDefault is a Marker2D")

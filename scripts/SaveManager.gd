@@ -21,12 +21,13 @@ static func load(path: String = "user://save.json") -> Dictionary:
 	return result
 
 
-static func save_dweller(dweller: Dweller, path: String = "user://save.json") -> void:
+static func save_dweller(dweller: Dweller, path: String = "user://save.json", current_area: String = "house") -> void:
 	var data := {
 		"hunger": dweller.hunger,
 		"energy": dweller.energy,
 		"mood": dweller.mood,
 		"stage": dweller.stage,
+		"current_area": current_area,
 	}
 	save(data, path)
 
@@ -46,3 +47,10 @@ static func load_into_dweller(dweller: Dweller, path: String = "user://save.json
 	if data.has("last_saved_at"):
 		return data["last_saved_at"]
 	return 0.0
+
+
+static func load_current_area(path: String = "user://save.json") -> String:
+	var data := SaveManager.load(path)
+	if data.has("current_area"):
+		return data["current_area"]
+	return "house"
