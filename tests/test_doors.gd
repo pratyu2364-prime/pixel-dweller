@@ -162,18 +162,40 @@ func test_garden_has_entry_from_house_marker() -> void:
 	assert_true(entry is Marker2D, "EntryFromHouse is Marker2D")
 
 
-func test_garden_has_door() -> void:
+func test_garden_has_house_door() -> void:
 	var garden := preload("res://scenes/areas/Garden.tscn").instantiate()
 	add_child_autofree(garden)
 	await get_tree().process_frame
 
-	var door_found := false
+	var found := false
 	for child in garden.get_children():
-		if child is Door:
-			door_found = true
-			assert_eq(child.target_area, "house", "Garden door targets house")
-			assert_eq(child.target_entry, "EntryFromGarden", "Garden door targets EntryFromGarden")
-	assert_true(door_found, "Garden has a Door child")
+		if child is Door and child.target_area == "house":
+			found = true
+			assert_eq(child.target_entry, "EntryFromGarden", "Garden house-door targets EntryFromGarden")
+	assert_true(found, "Garden has door targeting house")
+
+
+func test_garden_has_town_door() -> void:
+	var garden := preload("res://scenes/areas/Garden.tscn").instantiate()
+	add_child_autofree(garden)
+	await get_tree().process_frame
+
+	var found := false
+	for child in garden.get_children():
+		if child is Door and child.target_area == "town":
+			found = true
+			assert_eq(child.target_entry, "EntryFromGarden", "Garden town-door targets EntryFromGarden")
+	assert_true(found, "Garden has door targeting town")
+
+
+func test_garden_has_entry_from_town_garden_marker() -> void:
+	var garden := preload("res://scenes/areas/Garden.tscn").instantiate()
+	add_child_autofree(garden)
+	await get_tree().process_frame
+
+	var entry := garden.get_node_or_null("EntryFromTownGarden")
+	assert_not_null(entry, "Garden has EntryFromTownGarden Marker2D")
+	assert_true(entry is Marker2D, "EntryFromTownGarden is Marker2D")
 
 
 func test_house_has_door() -> void:
@@ -201,3 +223,76 @@ func test_transition_saves_current_area() -> void:
 	SaveManager.save_dweller(Dweller.new(), TEST_PATH, mgr.current_area)
 	var loaded: String = SaveManager.load_current_area(TEST_PATH)
 	assert_eq(loaded, "garden", "saved current_area is 'garden'")
+
+
+func test_area_manager_transition_to_town() -> void:
+	var mgr := AreaManager.new()
+	var container := Node2D.new()
+	add_child_autofree(container)
+
+	mgr.load_area("town", "EntryDefault", container)
+	assert_eq(mgr.current_area, "town", "current_area is 'town' after load")
+
+
+func test_town_has_entry_from_garden_marker() -> void:
+	var town := preload("res://scenes/areas/Town.tscn").instantiate()
+	add_child_autofree(town)
+	await get_tree().process_frame
+
+	var entry := town.get_node_or_null("EntryFromGarden")
+	assert_not_null(entry, "Town has EntryFromGarden Marker2D")
+	assert_true(entry is Marker2D, "EntryFromGarden is Marker2D")
+
+
+func test_town_has_door() -> void:
+	var town := preload("res://scenes/areas/Town.tscn").instantiate()
+	add_child_autofree(town)
+	await get_tree().process_frame
+
+	var found := false
+	for child in town.get_children():
+		if child is Door:
+			found = true
+			assert_eq(child.target_area, "garden", "Town door targets garden")
+			assert_eq(child.target_entry, "EntryFromTownGarden", "Town door targets EntryFromTownGarden")
+	assert_true(found, "Town has a Door child")
+
+
+func test_transition_saves_town_area() -> void:
+	var mgr := AreaManager.new()
+	var container := Node2D.new()
+	add_child_autofree(container)
+
+	mgr.load_area("town", "EntryDefault", container)
+
+	SaveManager.save_dweller(Dweller.new(), TEST_PATH, mgr.current_area)
+	var loaded: String = SaveManager.load_current_area(TEST_PATH)
+	assert_eq(loaded, "town", "saved current_area is 'town'")
+
+
+func test_transition_round_trip_places_player_correctly() -> void:
+	var mgr := AreaManager.new()
+	var container := Node2D.new()
+	add_child_autofree(container)
+
+	mgr.load_area("house", "EntryDefault", container)
+
+	mgr.load_area("garden", "EntryFromHouse", container)
+	var garden := mgr.get_current_area_node()
+	var entry_garden := garden.get_node_or_null("EntryFromHouse") as Marker2D
+	assert_eq(mgr.get_player().position, entry_garden.position, "player at Garden EntryFromHouse")
+
+	mgr.load_area("town", "EntryFromGarden", container)
+	var town := mgr.get_current_area_node()
+	var entry_town := town.get_node_or_null("EntryFromGarden") as Marker2D
+	assert_eq(mgr.current_area, "town", "current_area is 'town' after Garden->Town")
+	assert_eq(mgr.get_player().position, entry_town.position, "player at Town EntryFromGarden")
+
+	mgr.load_area("garden", "EntryFromTownGarden", container)
+	var garden2 := mgr.get_current_area_node()
+	var entry_garden2 := garden2.get_node_or_null("EntryFromTownGarden") as Marker2D
+	assert_eq(mgr.current_area, "garden", "current_area is 'garden' after Town->Garden")
+	assert_eq(mgr.get_player().position, entry_garden2.position, "player at Garden EntryFromTownGarden")
+
+	mgr.load_area("house", "EntryFromGarden", container)
+	assert_eq(mgr.current_area, "house", "current_area is 'house' after Garden->House")
