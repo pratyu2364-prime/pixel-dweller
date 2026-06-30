@@ -39,7 +39,7 @@ tasks_merged_today: 8
 | P1-6 | 1 | Life stages + growth | done | — | — | 0 | Baby→Kid→Adult |
 | P1-7 | 1 | World-change on growth | done | — | — | 0 | the novelty seed |
 | P1-8 | 1 | Polish + first ship | done | — | — | 0 | title+settings+credits |
-| P2-1 | 2 | Area framework + dynamic loading | todo | — | — | 0 | House loaded via AreaManager; saves current_area |
+| P2-1 | 2 | Area framework + dynamic loading | done | big-pickle | #13 | 1 | House loaded via AreaManager; saves current_area |
 | P2-2 | 2 | Door transitions + Garden | todo | — | — | 0 | walk-into-door + fade; House↔Garden |
 | P2-3 | 2 | Growth decor → Garden | todo | — | — | 0 | per-area novelty; House clean |
 | P2-4 | 2 | Town area + door | todo | — | — | 0 | 3 areas reachable on foot |
@@ -47,6 +47,7 @@ tasks_merged_today: 8
 | P2-6 | 2 | Phase 2 polish + ship | todo | — | — | 0 | area label; full tour; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-01 — P2-1 → done (att 1) PR#13 — worker big-pickle; AreaManager + dynamic area loading, House→scenes/areas/House.tscn, current_area saved; lead fixed AreaContainer parent + removed orphan World.tscn; 43 tests; merged+shipped
 - 2026-07-01 — Phase 2 aligned (explore: House+Garden+Town, walk-into-door transitions, per-area growth decor, Town NPC greeting). 6 tasks P2-1..P2-6 written as todo.
 - 2026-06-28 23:34:09 — P1-8 → done — worker big-pickle; Title+Settings+credits+stage label; Phase 1 COMPLETE; 3 tests
 - 2026-06-28 23:28:02 — P1-7 → done — worker big-pickle; THE NOVELTY: growth adds persistent world decorations (tree@Kid, flowers@Adult); 4 tests
