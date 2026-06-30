@@ -17,6 +17,7 @@ func _ready() -> void:
 
 	if $UI.dweller != null:
 		$UI._apply_stage_to_area($UI.dweller.stage)
+		$UI.set_area_label(area_manager.current_area)
 
 	$UI.talk_button.pressed.connect(_on_talk_pressed)
 
@@ -95,6 +96,7 @@ func _finish_transition(target_area: String, target_entry: String) -> void:
 
 	if $UI.dweller != null:
 		$UI._apply_stage_to_area($UI.dweller.stage)
+		$UI.set_area_label(area_manager.current_area)
 
 	_transitioning = false
 
