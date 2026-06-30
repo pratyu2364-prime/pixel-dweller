@@ -12,6 +12,7 @@ var dweller: Dweller
 @onready var rest_button: Button = $Margin/VBox/Buttons/Rest
 @onready var play_button: Button = $Margin/VBox/Buttons/Play
 @onready var stage_label: Label = $Margin/VBox/StageLabel
+@onready var area_label: Label = $Margin/VBox/AreaLabel
 @onready var dialog_label: Label = $Margin/VBox/DialogLabel
 @onready var talk_button: Button = $Margin/VBox/Buttons/Talk
 @onready var dialog_timer: Timer = $DialogTimer
@@ -94,6 +95,22 @@ func _stage_name(stage: int) -> String:
 			return "Adult"
 		_:
 			return ""
+
+
+static func pretty_area_name(key: String) -> String:
+	match key:
+		"house":
+			return "House"
+		"garden":
+			return "Garden"
+		"town":
+			return "Town"
+		_:
+			return key.capitalize()
+
+
+func set_area_label(area_name: String) -> void:
+	area_label.text = pretty_area_name(area_name)
 
 
 func show_dialog(text: String) -> void:

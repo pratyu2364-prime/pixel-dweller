@@ -44,9 +44,10 @@ tasks_merged_today: 8
 | P2-3 | 2 | Growth decor → Garden | done | big-pickle | #15 | 1 | per-area novelty; House clean |
 | P2-4 | 2 | Town area + door | done | big-pickle | #16 | 1 | 3 areas reachable on foot |
 | P2-5 | 2 | Town NPC greeting | done | big-pickle | #17 | 1 | dialog + cooldown mood boost |
-| P2-6 | 2 | Phase 2 polish + ship | todo | — | — | 0 | area label; full tour; ship |
+| P2-6 | 2 | Phase 2 polish + ship | done | big-pickle | #18 | 1 | area label; full tour; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-01 — P2-6 → done (att 1) PR#18 — worker big-pickle; area name label (updates on transition) + robust entry fallback (boot from saved town); PHASE 2 COMPLETE; 76 tests; full tour + town-boot verified headless
 - 2026-07-01 — P2-5 → done (att 1) PR#17 — worker big-pickle; Town NPC greeting (dialog + cooldown mood boost); interact action (E/Space) + touch Talk button; greet() pure cooldown logic; 69 tests; +10 mood once then cooldown verified headless
 - 2026-07-01 — P2-4 → done (att 1) PR#16 — worker big-pickle; Town area (distinct) + Garden↔Town doors; House↔Garden↔Town reachable on foot; current_area persists for town; 66 tests; round trip verified headless
 - 2026-07-01 — P2-3 → done (att 1) PR#15 — worker big-pickle; growth decor moved to Garden (scripts/Garden.gd); House has no apply_world_stage; stage re-applied on boot+transition so growth persists across areas; 59 tests; ADULT cross-area verified headless

@@ -63,6 +63,14 @@ func _unload_current() -> void:
 func _place_player(entry_name: String) -> void:
 	var entry: Marker2D = _current_area_node.get_node_or_null(entry_name) as Marker2D
 
+	if entry == null:
+		entry = _current_area_node.get_node_or_null("EntryDefault") as Marker2D
+	if entry == null:
+		for child in _current_area_node.get_children():
+			if child is Marker2D:
+				entry = child
+				break
+
 	var player_scene: PackedScene = preload("res://scenes/Player.tscn") as PackedScene
 	_player = player_scene.instantiate() as CharacterBody2D
 	if _player == null:
