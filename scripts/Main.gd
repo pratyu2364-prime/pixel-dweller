@@ -13,6 +13,9 @@ func _ready() -> void:
 	area_manager.load_area(saved_area, "EntryDefault", area_container)
 	_connect_area_doors()
 
+	if $UI.dweller != null:
+		$UI._apply_stage_to_area($UI.dweller.stage)
+
 
 func _connect_area_doors() -> void:
 	var area_node := area_manager.get_current_area_node()
@@ -58,4 +61,8 @@ func _finish_transition(target_area: String, target_entry: String) -> void:
 	SaveManager.save_dweller($UI.dweller, "user://save.json", target_area)
 	area_manager.load_area(target_area, target_entry, area_container)
 	_connect_area_doors()
+
+	if $UI.dweller != null:
+		$UI._apply_stage_to_area($UI.dweller.stage)
+
 	_transitioning = false
