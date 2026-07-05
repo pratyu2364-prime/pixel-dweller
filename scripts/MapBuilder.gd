@@ -2,35 +2,64 @@ class_name MapBuilder
 extends RefCounted
 
 ## Builds a playable world from an ASCII layout string.
-## Each character is one 16x16 cell. Rendering uses a single TileMapLayer with a
-## runtime-generated solid-color TileSet (no binary art assets). Solid cells get
-## full-cell collision polygons on the TileSet physics layer (collision_layer 1,
-## same as existing walls).
+## Each character is one 16x16 cell. Ground renders on a single TileMapLayer
+## using regions of the CC0 Ninja Adventure tilesets (assets/tiles). Prop
+## characters (trees, flowers, houses) become y-sorted Sprite2Ds with
+## StaticBody2D footprints, so the player walks behind them Pokemon-style.
 
 const CELL := 16
 
-## char -> {color, solid}. Digits are entry markers (walkable grass underneath).
-## 'D' is a door cell (walkable road underneath); positions surface in parse()
-## so the caller can wire Door scenes with target metadata.
+## Ground characters -> solidity (collision) semantics.
 const TILE_DEFS := {
-	".": {"color": Color(0.55, 0.75, 0.45), "solid": false}, # grass
-	",": {"color": Color(0.50, 0.72, 0.42), "solid": false}, # grass alt
-	"#": {"color": Color(0.45, 0.36, 0.30), "solid": true},  # building/wall
-	"r": {"color": Color(0.62, 0.58, 0.52), "solid": false}, # road
-	"p": {"color": Color(0.80, 0.74, 0.62), "solid": false}, # plaza paving
-	"w": {"color": Color(0.35, 0.55, 0.80), "solid": true},  # water
-	"t": {"color": Color(0.25, 0.50, 0.30), "solid": true},  # tree
-	"f": {"color": Color(0.85, 0.60, 0.75), "solid": false}, # flowers
-	"b": {"color": Color(0.60, 0.45, 0.30), "solid": false}, # bridge
+	".": {"solid": false}, # grass
+	",": {"solid": false}, # grass variant
+	"#": {"solid": true},  # building/wall
+	"r": {"solid": false}, # road/path
+	"p": {"solid": false}, # plaza/paving
+	"w": {"solid": true},  # water
+	"f": {"solid": false}, # flowers (sprite prop, walkable)
+	"b": {"solid": false}, # bridge / interior pavers
 }
 
-const ENTRY_UNDERLAY := "."
-const DOOR_UNDERLAY := "r"
+## Ground char -> [atlas source index into ART_SOURCES, tile coords].
+const ART_TILES := {
+	".": [0, Vector2i(1, 4)],
+	",": [0, Vector2i(3, 4)],
+	"r": [1, Vector2i(1, 8)],
+	"p": [1, Vector2i(1, 1)],
+	"w": [3, Vector2i(11, 2)],
+	"b": [2, Vector2i(1, 13)],
+	"#": [2, Vector2i(9, 1)],
+}
+
+const ART_SOURCES := [
+	"res://assets/tiles/TilesetField.png",
+	"res://assets/tiles/tileset_floor.png",
+	"res://assets/tiles/tileset_interior_floor.png",
+	"res://assets/tiles/TilesetWater.png",
+]
+
+## Prop chars -> sprite region + footprint. Footprint cells block movement
+## when solid; the sprite is y-sorted at the footprint's bottom edge.
+const PROP_DEFS := {
+	"t": {"tex": 0, "region": Rect2(0, 0, 32, 40), "size": Vector2i(1, 1), "solid": true},
+	"f": {"tex": 0, "region": Rect2(16, 176, 16, 16), "size": Vector2i(1, 1), "solid": false},
+	"H": {"tex": 1, "region": Rect2(0, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
+	"I": {"tex": 1, "region": Rect2(64, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
+	"J": {"tex": 1, "region": Rect2(128, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
+	"K": {"tex": 1, "region": Rect2(192, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
+}
+
+const PROP_TEXTURES := [
+	"res://assets/tiles/TilesetNature.png",
+	"res://assets/tiles/TilesetHouse.png",
+]
+
+const PAVED_CHARS := "bp"
 
 
 ## Pure: layout text -> structured map data. Unit-testable, no scene tree needed.
-## Returns {size: Vector2i, rows: PackedStringArray, entries: Dictionary[String, Vector2],
-##          doors: Array[Vector2i]}.
+## Returns {size, rows, entries, doors, props: [{char, cell}], solid_extra: {cell: true}}.
 static func parse(layout: String) -> Dictionary:
 	var rows := PackedStringArray()
 	var width := 0
@@ -43,8 +72,9 @@ static func parse(layout: String) -> Dictionary:
 
 	var entries: Dictionary = {}
 	var doors: Array[Vector2i] = []
+	var props: Array[Dictionary] = []
+	var solid_extra: Dictionary = {}
 	for y in rows.size():
-		# Pad short rows with grass so the grid is rectangular.
 		if rows[y].length() < width:
 			rows[y] = rows[y] + ".".repeat(width - rows[y].length())
 		for x in width:
@@ -53,21 +83,35 @@ static func parse(layout: String) -> Dictionary:
 				entries["Entry" + ch] = cell_center(Vector2i(x, y))
 			elif ch == "D":
 				doors.append(Vector2i(x, y))
+			elif PROP_DEFS.has(ch):
+				props.append({"char": ch, "cell": Vector2i(x, y)})
+				if PROP_DEFS[ch]["solid"]:
+					var size: Vector2i = PROP_DEFS[ch]["size"]
+					for fy in range(y, y + size.y):
+						for fx in range(x, x + size.x):
+							solid_extra[Vector2i(fx, fy)] = true
 
 	return {
 		"size": Vector2i(width, rows.size()),
 		"rows": rows,
 		"entries": entries,
 		"doors": doors,
+		"props": props,
+		"solid_extra": solid_extra,
 	}
 
 
-## Pure: is the cell at (x, y) solid (blocks movement)?
+## Pure: does the cell at (x, y) block movement?
 static func is_solid(parsed: Dictionary, cell: Vector2i) -> bool:
 	var size: Vector2i = parsed["size"]
 	if cell.x < 0 or cell.y < 0 or cell.x >= size.x or cell.y >= size.y:
 		return true
-	var def: Dictionary = TILE_DEFS.get(_render_char(parsed["rows"][cell.y][cell.x]), {})
+	if parsed["solid_extra"].has(cell):
+		return true
+	var ch: String = parsed["rows"][cell.y][cell.x]
+	var def: Dictionary = TILE_DEFS.get(_render_char(parsed["rows"], cell.x, cell.y), {})
+	if PROP_DEFS.has(ch):
+		return false # covered by solid_extra above when solid
 	return bool(def.get("solid", false))
 
 
@@ -82,9 +126,14 @@ static func bounds_of(parsed: Dictionary) -> Rect2:
 	return Rect2(0, 0, size.x * CELL, size.y * CELL)
 
 
-## Builds the TileMapLayer + entry Marker2Ds under `parent`. Returns the parsed data.
+## Builds the ground TileMapLayer, prop sprites and entry Marker2Ds under
+## `parent`, enabling y-sort so the player renders behind props. Returns
+## the parsed data.
 static func build(layout: String, parent: Node) -> Dictionary:
 	var parsed := parse(layout)
+	if parent is Node2D:
+		(parent as Node2D).y_sort_enabled = true
+
 	var tile_chars: Array = TILE_DEFS.keys()
 	var layer := TileMapLayer.new()
 	layer.name = "Map"
@@ -93,10 +142,12 @@ static func build(layout: String, parent: Node) -> Dictionary:
 	var rows: PackedStringArray = parsed["rows"]
 	for y in rows.size():
 		for x in rows[y].length():
-			var idx := tile_chars.find(_render_char(rows[y][x]))
+			var idx := tile_chars.find(_render_char(rows, x, y))
 			if idx >= 0:
 				layer.set_cell(Vector2i(x, y), 0, Vector2i(idx, 0))
 	parent.add_child(layer)
+
+	_spawn_props(parsed, parent)
 
 	for entry_name in parsed["entries"]:
 		var marker := Marker2D.new()
@@ -112,25 +163,88 @@ static func build(layout: String, parent: Node) -> Dictionary:
 	return parsed
 
 
-## Entry/door markers render as their walkable underlay tile.
-static func _render_char(ch: String) -> String:
-	if ch >= "1" and ch <= "9":
-		return ENTRY_UNDERLAY
+## Pure: what ground char a cell renders as. Entries and props show a
+## walkable neighbor's ground; doors show pavement so they read as mats.
+static func _render_char(rows: PackedStringArray, x: int, y: int) -> String:
+	var ch := rows[y][x]
+	if TILE_DEFS.has(ch):
+		return ch
 	if ch == "D":
-		return DOOR_UNDERLAY
-	return ch if TILE_DEFS.has(ch) else ENTRY_UNDERLAY
+		var near := _walkable_neighbor(rows, x, y)
+		return near if PAVED_CHARS.contains(near) else "r"
+	return _walkable_neighbor(rows, x, y)
 
 
-## One-row atlas texture: tile i is a 16x16 solid color with a subtle darker
-## bottom edge so large fields don't read as flat.
+static func _walkable_neighbor(rows: PackedStringArray, x: int, y: int) -> String:
+	for offset: Vector2i in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+		var nx: int = x + offset.x
+		var ny: int = y + offset.y
+		if ny < 0 or ny >= rows.size() or nx < 0 or nx >= rows[ny].length():
+			continue
+		var nch := rows[ny][nx]
+		if TILE_DEFS.has(nch) and not TILE_DEFS[nch]["solid"]:
+			return nch
+	return "."
+
+
+static func _spawn_props(parsed: Dictionary, parent: Node) -> void:
+	var textures: Array = []
+	for path: String in PROP_TEXTURES:
+		textures.append(load(path) if ResourceLoader.exists(path) else null)
+
+	for prop: Dictionary in parsed["props"]:
+		var def: Dictionary = PROP_DEFS[prop["char"]]
+		var tex: Texture2D = textures[def["tex"]]
+		if tex == null:
+			continue
+		var cell: Vector2i = prop["cell"]
+		var size: Vector2i = def["size"]
+		var region: Rect2 = def["region"]
+		var foot_w := size.x * CELL
+		var foot_h := size.y * CELL
+		var bottom := Vector2(cell.x * CELL + foot_w / 2.0, (cell.y + size.y) * CELL)
+
+		var sprite := Sprite2D.new()
+		sprite.texture = tex
+		sprite.region_enabled = true
+		sprite.region_rect = region
+		sprite.position = bottom
+		sprite.offset = Vector2(0, -region.size.y / 2.0)
+		parent.add_child(sprite)
+
+		if def["solid"]:
+			var body := StaticBody2D.new()
+			body.collision_layer = 1
+			var shape := CollisionShape2D.new()
+			var rect := RectangleShape2D.new()
+			rect.size = Vector2(foot_w, foot_h)
+			shape.shape = rect
+			body.add_child(shape)
+			body.position = Vector2(0, -foot_h / 2.0)
+			sprite.add_child(body)
+
+
+## One-row atlas per ground char from ART_TILES regions; solid chars get a
+## full-cell collision polygon. Art textures ship in the repo, but a color
+## fallback keeps headless tests meaningful if a region is missing.
 static func _make_tile_set(tile_chars: Array) -> TileSet:
 	var img := Image.create(CELL * tile_chars.size(), CELL, false, Image.FORMAT_RGBA8)
 	for i in tile_chars.size():
-		var color: Color = TILE_DEFS[tile_chars[i]]["color"]
-		var edge := color.darkened(0.12)
-		for y in CELL:
-			for x in CELL:
-				img.set_pixel(i * CELL + x, y, edge if y >= CELL - 2 else color)
+		var art: Array = ART_TILES.get(tile_chars[i], [])
+		var painted := false
+		if not art.is_empty() and ResourceLoader.exists(ART_SOURCES[art[0]]):
+			var src: Texture2D = load(ART_SOURCES[art[0]])
+			var src_img := src.get_image()
+			if src_img != null:
+				var coords: Vector2i = art[1]
+				img.blit_rect(
+					src_img,
+					Rect2i(coords.x * CELL, coords.y * CELL, CELL, CELL),
+					Vector2i(i * CELL, 0)
+				)
+				painted = true
+		if not painted:
+			img.fill_rect(Rect2i(i * CELL, 0, CELL, CELL), Color(0.5, 0.5, 0.5))
 
 	var atlas := TileSetAtlasSource.new()
 	atlas.texture = ImageTexture.create_from_image(img)

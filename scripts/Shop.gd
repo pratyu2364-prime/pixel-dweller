@@ -14,7 +14,7 @@ const LAYOUT := """
 #pppppppppppppppppp#
 #pp####pppp####pppp#
 #pppppppppppppppppp#
-#pppfppppppppppfppp#
+#pppppppppppppppppp#
 #pppppppppppppppppp#
 #pppppppppppppppppp#
 #ppppppppp1pppppppp#
