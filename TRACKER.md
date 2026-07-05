@@ -53,6 +53,9 @@ tasks_merged_today: 6
 | P3-6 | 3 | Phase 3 polish + ship | done | claude | #24 | 1 | full tour + door-graph invariant; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-05 — P4-4 → done PR#29 — lead; water bank edges via pure water_variant() 4-neighbor mask (river/fountain/ponds get foam edges, bridges pass through); 123 tests; deployed
+- 2026-07-05 — P4-3 → done PR#28 — lead; civic/museum/apartment slabs → house sprite clusters (~44 houses citywide); layout-only, BFS re-verified
+- 2026-07-05 — P4-2 → done PR#27 — lead; NPC sprites (samurai blue/green, idle anim, faces player via pure facing_toward); 121 tests
 - 2026-07-05 — P4-1 → done PR#26 — lead; REAL PIXEL ART: Ninja Adventure tilesets (grass/road/water/pavers/brick), tree+flower+house sprite props w/ y-sort + footprint collision, 20 houses in residential, red market shops, nearest-neighbor filtering; python-composited previews used to verify art before shipping; 118 tests
 - 2026-07-05 — P4-0 → done PR#25 — lead; desktop viewport 1280x720 (was 540x960 portrait); House+Garden rebuilt as MapBuilder tile rooms (owner: "just green screen"); World.gd removed; 114 tests
 - 2026-07-05 — P3-6 → done PR#24 — lead; full-tour test (9 stops), boot-from-every-save, door-graph invariant (7 doors), bad-entry fallback; 114 tests; PHASE 3 COMPLETE — the world is a city now
