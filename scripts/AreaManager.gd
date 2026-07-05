@@ -81,7 +81,4 @@ func _place_player(entry_name: String) -> void:
 
 	_current_area_node.add_child(_player)
 
-	var camera := Camera2D.new()
-	camera.zoom = Vector2(3.5, 3.5)
-	camera.position_smoothing_enabled = true
-	_player.add_child(camera)
+	CameraRig.attach(_player, _current_area_node)
