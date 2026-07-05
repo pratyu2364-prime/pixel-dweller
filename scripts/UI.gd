@@ -23,11 +23,8 @@ var _autosave_timer: float = 0.0
 func _ready() -> void:
 	dialog_timer.timeout.connect(_on_dialog_timer_timeout)
 	dweller = Dweller.new()
-	var last_saved: float = SaveManager.load_into_dweller(dweller, SAVE_PATH)
-	if last_saved > 0.0:
-		var elapsed: float = TimeManager.elapsed_since(last_saved)
-		if elapsed > 0.0:
-			dweller.apply_elapsed(elapsed)
+	# Care sim is paused (explorer pivot): no offline decay applied on boot.
+	SaveManager.load_into_dweller(dweller, SAVE_PATH)
 
 	dweller.grew_up.connect(_on_dweller_grew_up)
 
@@ -40,11 +37,6 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	dweller.apply_elapsed(delta)
-	hunger_bar.value = dweller.hunger
-	energy_bar.value = dweller.energy
-	mood_bar.value = dweller.mood
-
 	_autosave_timer += delta
 	if _autosave_timer >= AUTOSAVE_INTERVAL:
 		_autosave_timer = 0.0
