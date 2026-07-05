@@ -22,14 +22,29 @@ static func load(path: String = "user://save.json") -> Dictionary:
 
 
 static func save_dweller(dweller: Dweller, path: String = "user://save.json", current_area: String = "house") -> void:
-	var data := {
-		"hunger": dweller.hunger,
-		"energy": dweller.energy,
-		"mood": dweller.mood,
-		"stage": dweller.stage,
-		"current_area": current_area,
-	}
+	# Merge over the existing file so unrelated keys (met_npcs, ...) survive.
+	var data := SaveManager.load(path)
+	data["hunger"] = dweller.hunger
+	data["energy"] = dweller.energy
+	data["mood"] = dweller.mood
+	data["stage"] = dweller.stage
+	data["current_area"] = current_area
 	save(data, path)
+
+
+static func mark_npc_met(npc_id: String, path: String = "user://save.json") -> void:
+	if npc_id.is_empty():
+		return
+	var data := SaveManager.load(path)
+	var met: Array = data.get("met_npcs", [])
+	if not met.has(npc_id):
+		met.append(npc_id)
+	data["met_npcs"] = met
+	save(data, path)
+
+
+static func load_met_npcs(path: String = "user://save.json") -> Array:
+	return SaveManager.load(path).get("met_npcs", [])
 
 
 static func load_into_dweller(dweller: Dweller, path: String = "user://save.json") -> float:

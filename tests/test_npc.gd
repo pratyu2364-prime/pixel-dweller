@@ -3,27 +3,51 @@ extends GutTest
 const Npc := preload("res://scripts/Npc.gd")
 
 
-func test_first_greet_boosts_mood() -> void:
+func test_first_greet_gives_intro_and_boost() -> void:
 	var npc := Npc.new()
-	var result := npc.greet(100.0)
-	assert_eq(result.mood_boost, Npc.MOOD_BOOST, "first greet grants mood boost")
-	assert_true(result.text.length() > 0, "greeting text non-empty")
+	var result := npc.greet()
+	assert_eq(result.mood_boost, Npc.MOOD_BOOST, "first meeting grants mood boost")
+	assert_eq(result.text, npc.greeting, "first meeting uses full intro")
+	assert_true(npc.already_met, "greet marks NPC as met")
 
 
-func test_greet_within_cooldown_no_boost() -> void:
+func test_repeat_greet_short_line_no_boost() -> void:
 	var npc := Npc.new()
-	npc.greet(100.0)
-	var result := npc.greet(105.0)
-	assert_eq(result.mood_boost, 0.0, "within cooldown no mood boost")
-	assert_true(result.text.length() > 0, "text still returned within cooldown")
+	npc.greet()
+	var result := npc.greet()
+	assert_eq(result.mood_boost, 0.0, "no boost after first meeting")
+	assert_eq(result.text, npc.repeat_text, "repeat line after first meeting")
 
 
-func test_greet_after_cooldown_boosts_again() -> void:
+func test_preloaded_met_flag_skips_intro() -> void:
 	var npc := Npc.new()
-	npc.greet(100.0)
-	npc.greet(105.0)
-	var result := npc.greet(131.0)
-	assert_eq(result.mood_boost, Npc.MOOD_BOOST, "after cooldown boost again")
+	npc.already_met = true
+	var result := npc.greet()
+	assert_eq(result.text, npc.repeat_text, "met NPC from save greets with repeat line")
+	assert_eq(result.mood_boost, 0.0)
+
+
+func test_met_npcs_persist_via_save() -> void:
+	var path := "user://test_npc_met.json"
+	SaveManager.mark_npc_met("plaza_greeter", path)
+	SaveManager.mark_npc_met("berry_vendor", path)
+	SaveManager.mark_npc_met("plaza_greeter", path)
+	var met := SaveManager.load_met_npcs(path)
+	assert_eq(met.size(), 2, "no duplicate met entries")
+	assert_has(met, "plaza_greeter")
+	assert_has(met, "berry_vendor")
+	SaveManager.save_dweller(Dweller.new(), path, "town")
+	assert_eq(SaveManager.load_met_npcs(path).size(), 2, "save_dweller preserves met_npcs")
+	DirAccess.remove_absolute(path)
+
+
+func test_city_npcs_have_unique_ids_and_types() -> void:
+	var ids := {}
+	for entry: Dictionary in CityMap.NPCS:
+		assert_false(ids.has(entry["id"]), "duplicate npc id: %s" % entry["id"])
+		ids[entry["id"]] = true
+		assert_true(entry["type"].length() > 0, "npc has a type")
+		assert_true(entry["repeat"].length() > 0, "npc has a repeat line")
 
 
 func test_facing_toward_player() -> void:
