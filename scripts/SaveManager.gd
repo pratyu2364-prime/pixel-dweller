@@ -47,6 +47,18 @@ static func load_met_npcs(path: String = "user://save.json") -> Array:
 	return SaveManager.load(path).get("met_npcs", [])
 
 
+static func save_stats(stats: Stats, path: String = "user://save.json") -> void:
+	var data := SaveManager.load(path)
+	data["stats"] = stats.to_dict()
+	save(data, path)
+
+
+static func load_stats(stats: Stats, path: String = "user://save.json") -> void:
+	var data := SaveManager.load(path)
+	if data.has("stats"):
+		stats.from_dict(data["stats"])
+
+
 static func load_into_dweller(dweller: Dweller, path: String = "user://save.json") -> float:
 	var data := SaveManager.load(path)
 	if data.is_empty():
