@@ -235,7 +235,7 @@ func test_area_manager_transition_to_town() -> void:
 
 
 func test_town_has_entry_from_garden_marker() -> void:
-	var town := preload("res://scenes/areas/Town.tscn").instantiate()
+	var town := preload("res://scenes/areas/City.tscn").instantiate()
 	add_child_autofree(town)
 	await get_tree().process_frame
 
@@ -245,7 +245,7 @@ func test_town_has_entry_from_garden_marker() -> void:
 
 
 func test_town_has_door() -> void:
-	var town := preload("res://scenes/areas/Town.tscn").instantiate()
+	var town := preload("res://scenes/areas/City.tscn").instantiate()
 	add_child_autofree(town)
 	await get_tree().process_frame
 
