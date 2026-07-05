@@ -8,11 +8,14 @@ var _transitioning: bool = false
 var _active_npc: Npc = null
 var _district_accum: float = 0.0
 var _met_npcs: Array = []
+var stats: Stats = Stats.new()
 
 
 func _ready() -> void:
 	print("Pixel Dweller booted.")
 	_met_npcs = SaveManager.load_met_npcs()
+	SaveManager.load_stats(stats)
+	$UI.bind_stats(stats)
 	var saved_area: String = SaveManager.load_current_area()
 	area_manager.load_area(saved_area, "EntryDefault", area_container)
 	_connect_area_doors()

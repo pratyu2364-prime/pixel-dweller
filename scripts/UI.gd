@@ -3,8 +3,16 @@ extends CanvasLayer
 const SAVE_PATH := "user://save.json"
 const AUTOSAVE_INTERVAL := 5.0
 
-var dweller: Dweller
+const HEART_TEXTURES := {
+	"full": preload("res://assets/ui/heart.png"),
+	"half": preload("res://assets/ui/heart_2.png"),
+	"empty": preload("res://assets/ui/heart_3.png"),
+}
 
+var dweller: Dweller
+var stats: Stats
+
+@onready var hearts_row: HBoxContainer = $Margin/VBox/HeartsRow
 @onready var hunger_bar: ProgressBar = $Margin/VBox/HungerBar
 @onready var energy_bar: ProgressBar = $Margin/VBox/EnergyBar
 @onready var mood_bar: ProgressBar = $Margin/VBox/MoodBar
@@ -62,6 +70,30 @@ func _save() -> void:
 	var main := get_node("..") as Node
 	var area_manager: AreaManager = main.area_manager as AreaManager
 	SaveManager.save_dweller(dweller, SAVE_PATH, area_manager.current_area)
+	if stats != null:
+		SaveManager.save_stats(stats, SAVE_PATH)
+
+
+## Hearts HUD ------------------------------------------------------------
+
+func bind_stats(new_stats: Stats) -> void:
+	stats = new_stats
+	stats.changed.connect(_refresh_hearts)
+	_refresh_hearts()
+
+
+func _refresh_hearts() -> void:
+	if hearts_row == null or stats == null:
+		return
+	for child in hearts_row.get_children():
+		child.queue_free()
+	for state: String in Stats.hearts(stats.hp, stats.max_hp):
+		var rect := TextureRect.new()
+		rect.texture = HEART_TEXTURES[state]
+		rect.custom_minimum_size = Vector2(32, 32)
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		hearts_row.add_child(rect)
 
 
 func _on_dweller_grew_up(new_stage: int) -> void:
