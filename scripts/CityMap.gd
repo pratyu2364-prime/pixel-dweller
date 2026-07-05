@@ -194,9 +194,16 @@ func _after_build() -> void:
 
 
 ## NPCs must be direct children — Main._connect_area_npcs scans get_children().
+## Alternates samurai colors so the townsfolk don't look cloned.
 func _spawn_npcs() -> void:
-	for entry: Dictionary in NPCS:
+	var skins: Array = [
+		load("res://assets/character/samurai_blue.png"),
+		load("res://assets/character/samurai_green.png"),
+	]
+	for i in NPCS.size():
+		var entry: Dictionary = NPCS[i]
 		var npc: Npc = (preload("res://scenes/Npc.tscn") as PackedScene).instantiate()
 		npc.position = MapBuilder.cell_center(entry["cell"])
 		npc.greeting = entry["greeting"]
+		npc.sprite_texture = skins[i % skins.size()]
 		add_child(npc)
