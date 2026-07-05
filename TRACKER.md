@@ -53,6 +53,8 @@ tasks_merged_today: 6
 | P3-6 | 3 | Phase 3 polish + ship | done | claude | #24 | 1 | full tour + door-graph invariant; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-05 — P4-1 → done PR#26 — lead; REAL PIXEL ART: Ninja Adventure tilesets (grass/road/water/pavers/brick), tree+flower+house sprite props w/ y-sort + footprint collision, 20 houses in residential, red market shops, nearest-neighbor filtering; python-composited previews used to verify art before shipping; 118 tests
+- 2026-07-05 — P4-0 → done PR#25 — lead; desktop viewport 1280x720 (was 540x960 portrait); House+Garden rebuilt as MapBuilder tile rooms (owner: "just green screen"); World.gd removed; 114 tests
 - 2026-07-05 — P3-6 → done PR#24 — lead; full-tour test (9 stops), boot-from-every-save, door-graph invariant (7 doors), bad-entry fallback; 114 tests; PHASE 3 COMPLETE — the world is a city now
 - 2026-07-05 — P3-5 → done PR#23 — lead; 6 NPCs across districts + 8 named districts w/ live label (pure district_for + 0.3s poll); 110 tests
 - 2026-07-05 — P3-4 → done PR#22 — lead; Shop + NeighborHouse interiors (AreaMap base, zoom 2.5), city doors + return markers; fixed roads overdrawn by houses; 103 tests

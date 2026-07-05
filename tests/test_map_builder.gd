@@ -85,3 +85,41 @@ func test_build_solid_tiles_have_collision() -> void:
 	var road_atlas := layer.get_cell_atlas_coords(Vector2i(4, 1))
 	assert_eq(atlas.get_tile_data(wall_atlas, 0).get_collision_polygons_count(0), 1)
 	assert_eq(atlas.get_tile_data(road_atlas, 0).get_collision_polygons_count(0), 0)
+
+
+func test_prop_footprint_blocks_movement() -> void:
+	var parsed := MapBuilder.parse("....\n.H..\n....\n....\n....")
+	assert_true(MapBuilder.is_solid(parsed, Vector2i(1, 1)), "house anchor solid")
+	assert_true(MapBuilder.is_solid(parsed, Vector2i(3, 3)), "house footprint corner solid (4x3 clipped)")
+	assert_false(MapBuilder.is_solid(parsed, Vector2i(0, 0)), "outside footprint walkable")
+	assert_eq((parsed["props"] as Array).size(), 1)
+
+
+func test_flower_prop_is_walkable() -> void:
+	var parsed := MapBuilder.parse("...\n.f.\n...")
+	assert_false(MapBuilder.is_solid(parsed, Vector2i(1, 1)), "flowers walkable")
+
+
+func test_build_spawns_prop_sprites_and_collision() -> void:
+	var root := Node2D.new()
+	add_child_autofree(root)
+	MapBuilder.build("......\n.H..t.\n......\n......", root)
+
+	var sprites := 0
+	var bodies := 0
+	for child in root.get_children():
+		if child is Sprite2D:
+			sprites += 1
+			for sub in child.get_children():
+				if sub is StaticBody2D:
+					bodies += 1
+	assert_eq(sprites, 2, "house + tree sprites spawned")
+	assert_eq(bodies, 2, "both props solid")
+	assert_true(root.y_sort_enabled, "area y-sorts props vs player")
+
+
+func test_door_renders_as_paved_mat() -> void:
+	var rows := PackedStringArray(["....", ".D..", "...."])
+	assert_eq(MapBuilder._render_char(rows, 1, 1), "r", "door on grass renders road mat")
+	var rows2 := PackedStringArray(["pppp", "pDpp", "pppp"])
+	assert_eq(MapBuilder._render_char(rows2, 1, 1), "p", "door on plaza renders plaza")

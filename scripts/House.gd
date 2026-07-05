@@ -21,10 +21,10 @@ const LAYOUT := """
 #bb####bbbbbbbbbbbbbbbbbbbbbpp####ppp###
 #bbbbbbbbbbbbbbbbbbbbbbbbbbbppppppppp###
 #bbbbbbbbbbbbbbbbbbbbbbbbbbbppppppppp###
-#bbbbbbbbbfffffffbbbbbbbbbbbbbbbbbbbb###
-#bbbbbbbbbfffffffbbbbbbbbbbbbbbbbbbbb###
-#bbbbbbbbbfffffffbbbbbbbbbbbbbbbbbbbb###
-#bbbbbbbbbfffffffbbbbbbbbbb####bbbbbb###
+#bbbbbbbbbpppppppbbbbbbbbbbbbbbbbbbbb###
+#bbbbbbbbbpppppppbbbbbbbbbbbbbbbbbbbb###
+#bbbbbbbbbpppppppbbbbbbbbbbbbbbbbbbbb###
+#bbbbbbbbbpppppppbbbbbbbbbb####bbbbbb###
 #bbbbbbbbbbbbbbbbbbbbbbbbbb####bbbbbb###
 #bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb###
 #bb####bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb###
