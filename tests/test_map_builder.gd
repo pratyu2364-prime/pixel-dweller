@@ -123,3 +123,17 @@ func test_door_renders_as_paved_mat() -> void:
 	assert_eq(MapBuilder._render_char(rows, 1, 1), "r", "door on grass renders road mat")
 	var rows2 := PackedStringArray(["pppp", "pDpp", "pppp"])
 	assert_eq(MapBuilder._render_char(rows2, 1, 1), "p", "door on plaza renders plaza")
+
+
+func test_water_variant_banks() -> void:
+	var rows := PackedStringArray([".....", ".www.", ".www.", "....."])
+	assert_eq(MapBuilder.water_variant(rows, 1, 1), "w_tl", "top-left corner")
+	assert_eq(MapBuilder.water_variant(rows, 2, 1), "w_t", "top bank")
+	assert_eq(MapBuilder.water_variant(rows, 3, 1), "w_tr", "top-right corner")
+	assert_eq(MapBuilder.water_variant(rows, 2, 2), "w_b", "bottom bank")
+
+
+func test_water_variant_center_and_bridge() -> void:
+	var rows := PackedStringArray(["wwww", "wwww", "wbww", "wwww"])
+	assert_eq(MapBuilder.water_variant(rows, 1, 1), "w", "surrounded water is center")
+	assert_eq(MapBuilder.water_variant(rows, 1, 3), "w", "bridge above counts as water")

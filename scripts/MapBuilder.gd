@@ -21,15 +21,25 @@ const TILE_DEFS := {
 	"b": {"solid": false}, # bridge / interior pavers
 }
 
-## Ground char -> [atlas source index into ART_SOURCES, tile coords].
+## Render key -> [atlas source index into ART_SOURCES, tile coords].
+## w_* keys are water bank variants picked by water_variant() from the
+## grass-ringed pond autotile block.
 const ART_TILES := {
 	".": [0, Vector2i(1, 4)],
 	",": [0, Vector2i(3, 4)],
 	"r": [1, Vector2i(1, 8)],
 	"p": [1, Vector2i(1, 1)],
-	"w": [3, Vector2i(11, 2)],
+	"w": [3, Vector2i(1, 7)],
 	"b": [2, Vector2i(1, 13)],
 	"#": [2, Vector2i(9, 1)],
+	"w_tl": [3, Vector2i(0, 6)],
+	"w_t": [3, Vector2i(1, 6)],
+	"w_tr": [3, Vector2i(2, 6)],
+	"w_l": [3, Vector2i(0, 7)],
+	"w_r": [3, Vector2i(2, 7)],
+	"w_bl": [3, Vector2i(0, 8)],
+	"w_b": [3, Vector2i(1, 8)],
+	"w_br": [3, Vector2i(2, 8)],
 }
 
 const ART_SOURCES := [
@@ -134,15 +144,18 @@ static func build(layout: String, parent: Node) -> Dictionary:
 	if parent is Node2D:
 		(parent as Node2D).y_sort_enabled = true
 
-	var tile_chars: Array = TILE_DEFS.keys()
+	var render_keys: Array = ART_TILES.keys()
 	var layer := TileMapLayer.new()
 	layer.name = "Map"
-	layer.tile_set = _make_tile_set(tile_chars)
+	layer.tile_set = _make_tile_set(render_keys)
 
 	var rows: PackedStringArray = parsed["rows"]
 	for y in rows.size():
 		for x in rows[y].length():
-			var idx := tile_chars.find(_render_char(rows, x, y))
+			var key := _render_char(rows, x, y)
+			if key == "w":
+				key = water_variant(rows, x, y)
+			var idx := render_keys.find(key)
 			if idx >= 0:
 				layer.set_cell(Vector2i(x, y), 0, Vector2i(idx, 0))
 	parent.add_child(layer)
@@ -161,6 +174,30 @@ static func build(layout: String, parent: Node) -> Dictionary:
 		parent.add_child(fallback)
 
 	return parsed
+
+
+## Pure: which water tile a water cell renders as, from its bank sides.
+## Bridges ('b') count as water so banks don't wrap around them.
+static func water_variant(rows: PackedStringArray, x: int, y: int) -> String:
+	var vert := ""
+	if not _is_waterish(rows, x, y - 1):
+		vert = "t"
+	elif not _is_waterish(rows, x, y + 1):
+		vert = "b"
+	var horiz := ""
+	if not _is_waterish(rows, x - 1, y):
+		horiz = "l"
+	elif not _is_waterish(rows, x + 1, y):
+		horiz = "r"
+	if vert.is_empty() and horiz.is_empty():
+		return "w"
+	return "w_" + vert + horiz
+
+
+static func _is_waterish(rows: PackedStringArray, x: int, y: int) -> bool:
+	if y < 0 or y >= rows.size() or x < 0 or x >= rows[y].length():
+		return true
+	return rows[y][x] == "w" or rows[y][x] == "b"
 
 
 ## Pure: what ground char a cell renders as. Entries and props show a
@@ -227,10 +264,10 @@ static func _spawn_props(parsed: Dictionary, parent: Node) -> void:
 ## One-row atlas per ground char from ART_TILES regions; solid chars get a
 ## full-cell collision polygon. Art textures ship in the repo, but a color
 ## fallback keeps headless tests meaningful if a region is missing.
-static func _make_tile_set(tile_chars: Array) -> TileSet:
-	var img := Image.create(CELL * tile_chars.size(), CELL, false, Image.FORMAT_RGBA8)
-	for i in tile_chars.size():
-		var art: Array = ART_TILES.get(tile_chars[i], [])
+static func _make_tile_set(render_keys: Array) -> TileSet:
+	var img := Image.create(CELL * render_keys.size(), CELL, false, Image.FORMAT_RGBA8)
+	for i in render_keys.size():
+		var art: Array = ART_TILES.get(render_keys[i], [])
 		var painted := false
 		if not art.is_empty() and ResourceLoader.exists(ART_SOURCES[art[0]]):
 			var src: Texture2D = load(ART_SOURCES[art[0]])
@@ -263,10 +300,12 @@ static func _make_tile_set(tile_chars: Array) -> TileSet:
 		Vector2(-half, -half), Vector2(half, -half),
 		Vector2(half, half), Vector2(-half, half),
 	])
-	for i in tile_chars.size():
+	for i in render_keys.size():
 		var coords := Vector2i(i, 0)
 		atlas.create_tile(coords)
-		if TILE_DEFS[tile_chars[i]]["solid"]:
+		var key: String = render_keys[i]
+		var solid: bool = key.begins_with("w") or bool(TILE_DEFS.get(key, {}).get("solid", false))
+		if solid:
 			var data := atlas.get_tile_data(coords, 0)
 			data.add_collision_polygon(0)
 			data.set_collision_polygon_points(0, 0, full_cell)
