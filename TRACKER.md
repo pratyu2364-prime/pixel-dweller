@@ -53,6 +53,10 @@ tasks_merged_today: 6
 | P3-6 | 3 | Phase 3 polish + ship | done | claude | #24 | 1 | full tour + door-graph invariant; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-05 — P5-4 → done PR#34 — lead; map extended 100→140 wide: East Orchard district (tree rows, lake w/ banks, 7 farm houses, 2 new NPCs: Ines, Momo); .gdlintrc 150-col for layout rows; 128 tests
+- 2026-07-05 — P5-3 → done PR#33 — lead; furnished interiors (8 furniture props) + residents Sana (shop) & Yuki (neighbor house) with met-tracking
+- 2026-07-05 — P5-2 → done PR#32 — lead; one-time NPC dialogue: intro+boost first meeting, repeat line after; met_npcs persisted per npc_id (seed of per-NPC memory); NPC types + names
+- 2026-07-05 — P5-1 → done PR#31 — lead; care HUD hidden + decay paused (explorer pivot per owner); HUD = area label + dialog + Talk
 - 2026-07-05 — P4-4 → done PR#29 — lead; water bank edges via pure water_variant() 4-neighbor mask (river/fountain/ponds get foam edges, bridges pass through); 123 tests; deployed
 - 2026-07-05 — P4-3 → done PR#28 — lead; civic/museum/apartment slabs → house sprite clusters (~44 houses citywide); layout-only, BFS re-verified
 - 2026-07-05 — P4-2 → done PR#27 — lead; NPC sprites (samurai blue/green, idle anim, faces player via pure facing_toward); 121 tests
