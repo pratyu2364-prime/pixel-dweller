@@ -33,12 +33,24 @@ const DISTRICTS := [
 
 ## Cozy greeters scattered across districts (game is for a kid — keep it sweet).
 const NPCS := [
-	{"cell": Vector2i(58, 42), "greeting": "Welcome to the big city! So much to explore!"},
-	{"cell": Vector2i(24, 49), "greeting": "Fresh berries! Picked them this morning!"},
-	{"cell": Vector2i(85, 10), "greeting": "The park smells like flowers today!"},
-	{"cell": Vector2i(35, 68), "greeting": "I saw a fish jump right over the bridge!"},
-	{"cell": Vector2i(50, 105), "greeting": "Race you to the plaza! ...Maybe after my nap."},
-	{"cell": Vector2i(15, 19), "greeting": "The old clock tower rings at noon. Ding dong!"},
+	{"id": "plaza_greeter", "type": "villager", "cell": Vector2i(58, 42),
+		"greeting": "Welcome to the big city! I'm Milo — ask me anything!",
+		"repeat": "Enjoying the plaza? The fountain is my favorite spot."},
+	{"id": "berry_vendor", "type": "vendor", "cell": Vector2i(24, 49),
+		"greeting": "Fresh berries! Picked them this morning! I'm Rosa, by the way.",
+		"repeat": "Back for more berries? Best in town!"},
+	{"id": "park_stroller", "type": "elder", "cell": Vector2i(85, 10),
+		"greeting": "Ah, a new face! I'm Grandpa Ren. The park smells like flowers today.",
+		"repeat": "Flowers never get old, dear."},
+	{"id": "riverside_fisher", "type": "villager", "cell": Vector2i(35, 68),
+		"greeting": "Shh! I'm Finn. I saw a fish jump right over the bridge!",
+		"repeat": "Still waiting on that big one..."},
+	{"id": "racer_kid", "type": "kid", "cell": Vector2i(50, 105),
+		"greeting": "I'm Pip, fastest kid in town! Race you to the plaza! ...After my nap.",
+		"repeat": "Zzz... five more minutes..."},
+	{"id": "clock_keeper", "type": "elder", "cell": Vector2i(15, 19),
+		"greeting": "Welcome! I'm Tock. The old clock tower rings at noon. Ding dong!",
+		"repeat": "Ding dong! Right on schedule."},
 ]
 
 const LAYOUT := """
@@ -204,6 +216,9 @@ func _spawn_npcs() -> void:
 		var entry: Dictionary = NPCS[i]
 		var npc: Npc = (preload("res://scenes/Npc.tscn") as PackedScene).instantiate()
 		npc.position = MapBuilder.cell_center(entry["cell"])
+		npc.npc_id = entry["id"]
+		npc.npc_type = entry["type"]
 		npc.greeting = entry["greeting"]
+		npc.repeat_text = entry["repeat"]
 		npc.sprite_texture = skins[i % skins.size()]
 		add_child(npc)

@@ -7,10 +7,12 @@ var area_manager: AreaManager = AreaManager.new()
 var _transitioning: bool = false
 var _active_npc: Npc = null
 var _district_accum: float = 0.0
+var _met_npcs: Array = []
 
 
 func _ready() -> void:
 	print("Pixel Dweller booted.")
+	_met_npcs = SaveManager.load_met_npcs()
 	var saved_area: String = SaveManager.load_current_area()
 	area_manager.load_area(saved_area, "EntryDefault", area_container)
 	_connect_area_doors()
@@ -69,6 +71,7 @@ func _connect_area_npcs() -> void:
 	for child in area_node.get_children():
 		if child is Npc:
 			var npc := child as Npc
+			npc.already_met = _met_npcs.has(npc.npc_id)
 			npc.greeted.connect(_on_npc_greeted)
 			npc.range_changed.connect(_on_npc_range_changed)
 
@@ -124,6 +127,10 @@ func _finish_transition(target_area: String, target_entry: String) -> void:
 
 func _on_npc_greeted(text: String, mood_boost: float) -> void:
 	$UI.show_dialog(text)
+	if _active_npc != null and not _active_npc.npc_id.is_empty():
+		if not _met_npcs.has(_active_npc.npc_id):
+			_met_npcs.append(_active_npc.npc_id)
+			SaveManager.mark_npc_met(_active_npc.npc_id)
 	if mood_boost > 0.0:
 		$UI.dweller.refill_need("mood", mood_boost)
 		$UI._save()
