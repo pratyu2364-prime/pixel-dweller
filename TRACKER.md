@@ -14,8 +14,8 @@ default_worker: opencode/big-pickle   # primary codegen model
 escalation_worker: hermes/grok        # used after 2 failed attempts
 reviewer: claude         # only Claude reviews/merges
 retry_cap: 2             # attempts before escalating model
-date: 2026-06-28
-tasks_merged_today: 8
+date: 2026-07-05
+tasks_merged_today: 6
 ```
 
 ## Legend
@@ -45,14 +45,20 @@ tasks_merged_today: 8
 | P2-4 | 2 | Town area + door | done | big-pickle | #16 | 1 | 3 areas reachable on foot |
 | P2-5 | 2 | Town NPC greeting | done | big-pickle | #17 | 1 | dialog + cooldown mood boost |
 | P2-6 | 2 | Phase 2 polish + ship | done | big-pickle | #18 | 1 | area label; full tour; ship |
-| P3-1 | 3 | Zoomed-out camera + bounds clamp | todo | — | — | 0 | zoom 2.0; clamp to area bounds |
-| P3-2 | 3 | MapBuilder ASCII→world core | todo | — | — | 0 | LEAD writes core; runtime tileset |
-| P3-3 | 3 | Big city map v1 | todo | — | — | 0 | ≥100x120 cells; districts; replaces Town |
-| P3-4 | 3 | Enterable buildings (interiors) | todo | — | — | 0 | shop + neighbor house |
-| P3-5 | 3 | Populate city: NPCs + districts | todo | — | — | 0 | 5+ NPCs; district labels |
-| P3-6 | 3 | Phase 3 polish + ship | todo | — | — | 0 | full tour; legacy-save boot; deploy |
+| P3-1 | 3 | Zoomed-out camera + bounds clamp | done | claude | #19 | 1 | zoom 2.0; CameraRig clamp; House 2.5 |
+| P3-2 | 3 | MapBuilder ASCII→world core | done | claude | #20 | 1 | runtime tileset; tile collision |
+| P3-3 | 3 | Big city map v1 | done | claude | #21 | 1 | 100x120 cells; BFS-verified; replaces Town |
+| P3-4 | 3 | Enterable buildings (interiors) | done | claude | #22 | 1 | Shop + NeighborHouse; AreaMap base |
+| P3-5 | 3 | Populate city: NPCs + districts | done | claude | #23 | 1 | 6 NPCs; 8 districts; live label |
+| P3-6 | 3 | Phase 3 polish + ship | done | claude | #24 | 1 | full tour + door-graph invariant; ship |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-05 — P3-6 → done PR#24 — lead; full-tour test (9 stops), boot-from-every-save, door-graph invariant (7 doors), bad-entry fallback; 114 tests; PHASE 3 COMPLETE — the world is a city now
+- 2026-07-05 — P3-5 → done PR#23 — lead; 6 NPCs across districts + 8 named districts w/ live label (pure district_for + 0.3s poll); 110 tests
+- 2026-07-05 — P3-4 → done PR#22 — lead; Shop + NeighborHouse interiors (AreaMap base, zoom 2.5), city doors + return markers; fixed roads overdrawn by houses; 103 tests
+- 2026-07-05 — P3-3 → done PR#21 — lead; 100x120-cell city (districts/river/bridges/plaza), BFS-verified connectivity, "town" key → City.tscn (legacy saves fine), Entry1→EntryFromGarden alias; 97 tests
+- 2026-07-05 — P3-2 → done PR#20 — lead; MapBuilder core (ASCII→TileMapLayer, runtime tileset, tile collision); found+fixed: atlas must join TileSet before physics data; 89 tests
+- 2026-07-05 — P3-1 → done PR#19 — lead; camera 3.5→2.0 + CameraRig bounds clamp + per-area zoom; 81 tests. NOTE: workers down (big-pickle API err x2, hermes blocked); owner authorized lead codegen + self-merge this session
 - 2026-07-05 — Phase 3 aligned (WORLD BUILDING: zoom out camera 3.5→2.0 + clamp; data-driven ASCII MapBuilder [lead-written]; huge Pokemon-style city w/ districts/river/plaza replacing Town; interiors; NPCs). Game objective deliberately deferred by owner. 6 tasks P3-1..P3-6 todo.
 - 2026-07-01 — P2-6 → done (att 1) PR#18 — worker big-pickle; area name label (updates on transition) + robust entry fallback (boot from saved town); PHASE 2 COMPLETE; 76 tests; full tour + town-boot verified headless
 - 2026-07-01 — P2-5 → done (att 1) PR#17 — worker big-pickle; Town NPC greeting (dialog + cooldown mood boost); interact action (E/Space) + touch Talk button; greet() pure cooldown logic; 69 tests; +10 mood once then cooldown verified headless
