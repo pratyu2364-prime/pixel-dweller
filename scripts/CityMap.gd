@@ -5,9 +5,6 @@ extends Node2D
 ## (100x120 cells, 16px each -> 1600x1920 px). Districts: civic NW, park NE,
 ## market street, central plaza with fountain, riverside, residential south.
 
-## Camera stays at CameraRig default (2.0); exported so interiors could differ.
-@export var camera_zoom: float = 0.0
-
 ## Door cells ('D' in LAYOUT) -> transition wiring.
 const DOORS := {
 	Vector2i(3, 87): {"target_area": "garden", "target_entry": "EntryFromTownGarden"},
@@ -140,6 +137,9 @@ const LAYOUT := """
 #t.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.ttt#
 ####################################################################################################
 """
+
+## Camera stays at CameraRig default (2.0); exported so interiors could differ.
+@export var camera_zoom: float = 0.0
 
 var _parsed: Dictionary = {}
 
