@@ -1,5 +1,5 @@
 class_name CityMap
-extends Node2D
+extends AreaMap
 
 ## The big city — Phase 3 world. Built at runtime by MapBuilder from LAYOUT
 ## (100x120 cells, 16px each -> 1600x1920 px). Districts: civic NW, park NE,
@@ -8,11 +8,15 @@ extends Node2D
 ## Door cells ('D' in LAYOUT) -> transition wiring.
 const DOORS := {
 	Vector2i(3, 87): {"target_area": "garden", "target_entry": "EntryFromTownGarden"},
+	Vector2i(18, 52): {"target_area": "shop", "target_entry": "EntryDefault"},
+	Vector2i(45, 98): {"target_area": "neighbor_house", "target_entry": "EntryDefault"},
 }
 
 ## MapBuilder digit entries -> semantic marker names other areas target.
 const ENTRY_ALIASES := {
 	"Entry1": "EntryFromGarden",
+	"Entry3": "EntryFromShop",
+	"Entry4": "EntryFromNeighborHouse",
 }
 
 const LAYOUT := """
@@ -67,8 +71,8 @@ const LAYOUT := """
 #trrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrt#
 #trrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr.#
 #.rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrt#
-#t.......,..........,.......rrrr..........,..........,..........,...rrrr...,..........,..........,t#
-#t..,...######.,######....,.rrrr.....,######..######....######......rrrr....######..######..,......#
+#t.......,......3...,.......rrrr..........,..........,..........,...rrrr...,..........,..........,t#
+#t..,...######.,##D###....,.rrrr.....,######..######....######......rrrr....######..######..,......#
 #.......######..######......rrrr,.....######..######..,.######...,..rrrr....######..######........t#
 #t...,..######..######.....,rrrr......######..######....######......rrrr....######,.######...,....t#
 #t......######..######,.....rrrr.,....######,.######...,######....,.rrrr....######..######.........#
@@ -108,29 +112,29 @@ const LAYOUT := """
 #.....,..........,..........rrrr.......,..........,..........,......rrrr,..........,..........,...t#
 #t..........,..........,....rrrr..,..........,..........,..........,rrrr......,..........,........t#
 #t.....,..........,.........rrrr........,..........,..........,.....rrrr.,..........,..........,...#
-#.,...#######,....#######...rr#######.....#######.....#######.....#######.....#######.....,.......t#
-#t....#######.....#######...rr#######....,#######...,.#######..,..#######.,...#######,..........,.t#
-#t.,..#######.,...#######,..rr#######.....#######.....#######.....#######.....#######......,.......#
+#.,...#######,....#######...rrrr#####.....#######.....#######.....##rrrr......#######.....,.......t#
+#t....#######.....#######...rrrr#####....,#######...,.#######..,..##rrrr..,...#######,..........,.t#
+#t.,..#######.,...#######,..rrrr#####.....#######.....#######.....##rrrr......#######......,.......#
 #........,..........,.......rrrr..........,..........,..........,...rrrr...,..........,..........,t#
-#t..,.#######..,..#######.,.rr#######,....#######.....#######.....#######.....#######.......,.....t#
-#t....#######.....#######...rr#######.....#######.....#######....,#######...,.#######..,..........,#
-#....,#######...,.#######..,rr#######.,...#######,....#######.....#######.....#######........,....t#
+#t..,.#######..,..#######.,.rrrr#####,....#######.....#######.....##rrrr......#######.......,.....t#
+#t....#######.....#######...rrrr#####.....#######.....#######....,##rrrr....,.#######..,..........,#
+#....,#######...,.#######..,rrrr#####.,...###D###,....#######.....##rrrr......#######........,....t#
 #t.........,..........,.....rrrr.,..........,..........,..........,.rrrr.....,..........,.........t#
 #t....,..........,..........rrrr.......,..........,..........,......rrrr,..........,..........,....#
-#,..........,..........,....rrrr..,..........,..........,..........,rrrr......,..........,........t#
+#,..........,..........,....rrrr..,..........4..........,..........,rrrr......,..........,........t#
 #t.....,..........,.........rrrr........,..........,..........,.....rrrr.,..........,..........,..t#
 #t,..........,..........,...rrrr...,..........,..........,..........rrrr.......,..........,........#
 #.rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrt#
 #trrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrt#
 #trrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr.#
 #...,..........,..........,.rrrr.....,..........,..........,........rrrr.........,..........,.....t#
-#t....#######.....#######...rr#######.....#######.....#######....,#######...,.##wwwwwwwww.........t#
-#t...,#######...,.#######..,rr#######.,...#######,....#######.....#######.....##wwwwwwwww....,.....#
-#.....#######.....#######...rr#######.....#######.....#######.....#######....,##wwwwwwwww.........t#
+#t....#######.....#######...rrrr#####.....#######.....#######....,##rrrr....,.##wwwwwwwww.........t#
+#t...,#######...,.#######..,rrrr#####.,...#######,....#######.....##rrrr......##wwwwwwwww....,.....#
+#.....#######.....#######...rrrr#####.....#######.....#######.....##rrrr.....,##wwwwwwwww.........t#
 #t....,..........,..........rrrr.......,..........,..........,......rrrr,.......wwwwwwwww.....,...t#
-#t....#######.....#######...rr#######.....#######.....#######.....#######.....##wwwwwwwww,.........#
-#.....#######.....#######...rr#######...,.#######..,..#######.,...#######,....##wwwwwwwww......,..t#
-#t,...#######,....#######...rr#######.....#######.....#######.....#######.....##wwwwwwwww.,.......t#
+#t....#######.....#######...rrrr#####.....#######.....#######.....##rrrr......##wwwwwwwww,.........#
+#.....#######.....#######...rrrr#####...,.#######..,..#######.,...##rrrr.,....##wwwwwwwww......,..t#
+#t,...#######,....#######...rrrr#####.....#######.....#######.....##rrrr......##wwwwwwwww.,.......t#
 #t......,..........,........rrrr.........,..........,..........,....rrrr..,..........,..........,..#
 #..,..........,..........,..rrrr....,..........,..........,.........rrrr........,..........,......t#
 #t.......,..........,.......rrrr..........,..........,..........,...rrrr...,..........,..........,t#
@@ -138,36 +142,17 @@ const LAYOUT := """
 ####################################################################################################
 """
 
-## Camera stays at CameraRig default (2.0); exported so interiors could differ.
-@export var camera_zoom: float = 0.0
-
-var _parsed: Dictionary = {}
+func _layout() -> String:
+	return LAYOUT
 
 
-func _ready() -> void:
-	_parsed = MapBuilder.build(LAYOUT, self)
-	_spawn_doors()
+func _door_table() -> Dictionary:
+	return DOORS
+
+
+func _after_build() -> void:
 	_alias_entries()
 	_spawn_npcs()
-
-
-func get_area_bounds() -> Rect2:
-	if _parsed.is_empty():
-		_parsed = MapBuilder.parse(LAYOUT)
-	return MapBuilder.bounds_of(_parsed)
-
-
-## Doors must be direct children — Main._connect_area_doors scans get_children().
-func _spawn_doors() -> void:
-	for cell: Vector2i in _parsed["doors"]:
-		var info: Dictionary = DOORS.get(cell, {})
-		if info.is_empty():
-			continue
-		var door: Door = (preload("res://scenes/Door.tscn") as PackedScene).instantiate()
-		door.position = MapBuilder.cell_center(cell)
-		door.target_area = info["target_area"]
-		door.target_entry = info["target_entry"]
-		add_child(door)
 
 
 func _alias_entries() -> void:

@@ -251,11 +251,10 @@ func test_town_has_door() -> void:
 
 	var found := false
 	for child in town.get_children():
-		if child is Door:
+		if child is Door and child.target_area == "garden":
 			found = true
-			assert_eq(child.target_area, "garden", "Town door targets garden")
 			assert_eq(child.target_entry, "EntryFromTownGarden", "Town door targets EntryFromTownGarden")
-	assert_true(found, "Town has a Door child")
+	assert_true(found, "Town has a garden Door child")
 
 
 func test_transition_saves_town_area() -> void:

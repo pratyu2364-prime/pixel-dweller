@@ -37,11 +37,10 @@ func test_city_door_targets_garden() -> void:
 
 	var found := false
 	for child in city.get_children():
-		if child is Door:
+		if child is Door and child.target_area == "garden":
 			found = true
-			assert_eq(child.target_area, "garden", "city door targets garden")
 			assert_eq(child.target_entry, "EntryFromTownGarden", "city door entry marker")
-	assert_true(found, "city has a Door child")
+	assert_true(found, "city has a garden Door child")
 
 
 func test_city_has_npc() -> void:
