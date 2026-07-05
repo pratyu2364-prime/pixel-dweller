@@ -6,6 +6,7 @@ extends Node2D
 var area_manager: AreaManager = AreaManager.new()
 var _transitioning: bool = false
 var _active_npc: Npc = null
+var _district_accum: float = 0.0
 
 
 func _ready() -> void:
@@ -20,6 +21,26 @@ func _ready() -> void:
 		$UI.set_area_label(area_manager.current_area)
 
 	$UI.talk_button.pressed.connect(_on_talk_pressed)
+
+
+func _process(delta: float) -> void:
+	_district_accum += delta
+	if _district_accum < 0.3:
+		return
+	_district_accum = 0.0
+	_update_district_label()
+
+
+## In areas with districts (the city), the label tracks where the player walks.
+func _update_district_label() -> void:
+	if _transitioning:
+		return
+	var area_node := area_manager.get_current_area_node()
+	var player := area_manager.get_player()
+	if area_node == null or player == null:
+		return
+	if area_node.has_method("district_at"):
+		$UI.set_area_label_text(area_node.district_at(player.position))
 
 
 func _connect_area_doors() -> void:

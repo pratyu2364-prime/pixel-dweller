@@ -19,6 +19,28 @@ const ENTRY_ALIASES := {
 	"Entry4": "EntryFromNeighborHouse",
 }
 
+## Ordered world-px regions; first hit wins. Bands first, then quadrants.
+const DISTRICTS := [
+	{"name": "Market Street", "rect": Rect2(0, 768, 1600, 160)},
+	{"name": "Riverside", "rect": Rect2(0, 928, 1600, 352)},
+	{"name": "Maple Residential", "rect": Rect2(0, 1280, 1600, 640)},
+	{"name": "Old Quarter", "rect": Rect2(0, 0, 448, 768)},
+	{"name": "Riverside Park", "rect": Rect2(1152, 0, 448, 288)},
+	{"name": "Museum District", "rect": Rect2(1152, 288, 448, 480)},
+	{"name": "Sunny Plaza", "rect": Rect2(448, 544, 704, 224)},
+	{"name": "North Avenue", "rect": Rect2(448, 0, 704, 544)},
+]
+
+## Cozy greeters scattered across districts (game is for a kid — keep it sweet).
+const NPCS := [
+	{"cell": Vector2i(58, 42), "greeting": "Welcome to the big city! So much to explore!"},
+	{"cell": Vector2i(24, 49), "greeting": "Fresh berries! Picked them this morning!"},
+	{"cell": Vector2i(85, 10), "greeting": "The park smells like flowers today!"},
+	{"cell": Vector2i(35, 68), "greeting": "I saw a fish jump right over the bridge!"},
+	{"cell": Vector2i(50, 105), "greeting": "Race you to the plaza! ...Maybe after my nap."},
+	{"cell": Vector2i(15, 19), "greeting": "The old clock tower rings at noon. Ding dong!"},
+]
+
 const LAYOUT := """
 ####################################################################################################
 #t.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.ttt#
@@ -142,6 +164,19 @@ const LAYOUT := """
 ####################################################################################################
 """
 
+## Pure: world position -> district name. Unit-testable.
+static func district_for(pos: Vector2) -> String:
+	for district: Dictionary in DISTRICTS:
+		if (district["rect"] as Rect2).has_point(pos):
+			return district["name"]
+	return "City"
+
+
+## Instance hook Main polls for the on-screen area label.
+func district_at(pos: Vector2) -> String:
+	return district_for(pos)
+
+
 func _layout() -> String:
 	return LAYOUT
 
@@ -167,9 +202,9 @@ func _alias_entries() -> void:
 
 
 ## NPCs must be direct children — Main._connect_area_npcs scans get_children().
-## One plaza greeter for now; the city gets populated in P3-5.
 func _spawn_npcs() -> void:
-	var npc: Npc = (preload("res://scenes/Npc.tscn") as PackedScene).instantiate()
-	npc.position = MapBuilder.cell_center(Vector2i(58, 42))
-	npc.greeting = "Welcome to the big city! So much to explore!"
-	add_child(npc)
+	for entry: Dictionary in NPCS:
+		var npc: Npc = (preload("res://scenes/Npc.tscn") as PackedScene).instantiate()
+		npc.position = MapBuilder.cell_center(entry["cell"])
+		npc.greeting = entry["greeting"]
+		add_child(npc)
