@@ -45,8 +45,15 @@ tasks_merged_today: 8
 | P2-4 | 2 | Town area + door | done | big-pickle | #16 | 1 | 3 areas reachable on foot |
 | P2-5 | 2 | Town NPC greeting | done | big-pickle | #17 | 1 | dialog + cooldown mood boost |
 | P2-6 | 2 | Phase 2 polish + ship | done | big-pickle | #18 | 1 | area label; full tour; ship |
+| P3-1 | 3 | Zoomed-out camera + bounds clamp | todo | — | — | 0 | zoom 2.0; clamp to area bounds |
+| P3-2 | 3 | MapBuilder ASCII→world core | todo | — | — | 0 | LEAD writes core; runtime tileset |
+| P3-3 | 3 | Big city map v1 | todo | — | — | 0 | ≥100x120 cells; districts; replaces Town |
+| P3-4 | 3 | Enterable buildings (interiors) | todo | — | — | 0 | shop + neighbor house |
+| P3-5 | 3 | Populate city: NPCs + districts | todo | — | — | 0 | 5+ NPCs; district labels |
+| P3-6 | 3 | Phase 3 polish + ship | todo | — | — | 0 | full tour; legacy-save boot; deploy |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-05 — Phase 3 aligned (WORLD BUILDING: zoom out camera 3.5→2.0 + clamp; data-driven ASCII MapBuilder [lead-written]; huge Pokemon-style city w/ districts/river/plaza replacing Town; interiors; NPCs). Game objective deliberately deferred by owner. 6 tasks P3-1..P3-6 todo.
 - 2026-07-01 — P2-6 → done (att 1) PR#18 — worker big-pickle; area name label (updates on transition) + robust entry fallback (boot from saved town); PHASE 2 COMPLETE; 76 tests; full tour + town-boot verified headless
 - 2026-07-01 — P2-5 → done (att 1) PR#17 — worker big-pickle; Town NPC greeting (dialog + cooldown mood boost); interact action (E/Space) + touch Talk button; greet() pure cooldown logic; 69 tests; +10 mood once then cooldown verified headless
 - 2026-07-01 — P2-4 → done (att 1) PR#16 — worker big-pickle; Town area (distinct) + Garden↔Town doors; House↔Garden↔Town reachable on foot; current_area persists for town; 66 tests; round trip verified headless
