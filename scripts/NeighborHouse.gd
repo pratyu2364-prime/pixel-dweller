@@ -9,17 +9,24 @@ const DOORS := {
 
 const LAYOUT := """
 ##################
-#....##....##....#
-#................#
-#..ff........ff..#
-#................#
-#......####......#
-#......####......#
-#........1.......#
-#................#
-#................#
+#bloqbbbbbbbbqolb#
+#bmmbbbbbbbbbbbub#
+#bbbbbbbbbbbbbbbb#
+#bbbbbbcnncbbbbbb#
+#bbbbbbbnnbbbbbbb#
+#bbbbbbcbbcbbbbbb#
+#bbbbbbbb1bbbbbbb#
+#bbbbbbbbbbbbbbbb#
+#bbbbbbbbbbbbbbbb#
 #########D########
 """
+
+
+const RESIDENT := {
+	"id": "neighbor_yuki", "type": "villager", "cell": Vector2i(12, 4),
+	"greeting": "Oh, a visitor! I'm Yuki, your neighbor. Make yourself at home!",
+	"repeat": "Come by any time, neighbor!",
+}
 
 
 func _layout() -> String:
@@ -28,3 +35,7 @@ func _layout() -> String:
 
 func _door_table() -> Dictionary:
 	return DOORS
+
+
+func _after_build() -> void:
+	_spawn_resident(RESIDENT, "res://assets/character/samurai_blue.png")

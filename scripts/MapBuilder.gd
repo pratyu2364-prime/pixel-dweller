@@ -58,11 +58,20 @@ const PROP_DEFS := {
 	"I": {"tex": 1, "region": Rect2(64, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
 	"J": {"tex": 1, "region": Rect2(128, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
 	"K": {"tex": 1, "region": Rect2(192, 0, 64, 48), "size": Vector2i(4, 3), "solid": true},
+	"m": {"tex": 2, "region": Rect2(112, 0, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"n": {"tex": 1, "region": Rect2(64, 48, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"o": {"tex": 1, "region": Rect2(0, 48, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"q": {"tex": 1, "region": Rect2(32, 48, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"u": {"tex": 1, "region": Rect2(80, 48, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"l": {"tex": 1, "region": Rect2(96, 48, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"x": {"tex": 1, "region": Rect2(112, 48, 16, 16), "size": Vector2i(1, 1), "solid": true},
+	"c": {"tex": 2, "region": Rect2(128, 0, 16, 16), "size": Vector2i(1, 1), "solid": false},
 }
 
 const PROP_TEXTURES := [
 	"res://assets/tiles/TilesetNature.png",
 	"res://assets/tiles/TilesetHouse.png",
+	"res://assets/tiles/InteriorElements.png",
 ]
 
 const PAVED_CHARS := "bp"

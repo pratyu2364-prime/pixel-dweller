@@ -52,6 +52,19 @@ func _apply_entry_aliases() -> void:
 		add_child(alias)
 
 
+## Resident NPC helper for interiors. NPCs must be direct children —
+## Main._connect_area_npcs scans get_children().
+func _spawn_resident(info: Dictionary, skin_path: String) -> void:
+	var npc: Npc = (preload("res://scenes/Npc.tscn") as PackedScene).instantiate()
+	npc.position = MapBuilder.cell_center(info["cell"])
+	npc.npc_id = info["id"]
+	npc.npc_type = info["type"]
+	npc.greeting = info["greeting"]
+	npc.repeat_text = info["repeat"]
+	npc.sprite_texture = load(skin_path)
+	add_child(npc)
+
+
 ## Doors must be direct children — Main._connect_area_doors scans get_children().
 func _spawn_doors() -> void:
 	for cell: Vector2i in _parsed["doors"]:
