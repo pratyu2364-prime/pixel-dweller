@@ -185,20 +185,12 @@ func _door_table() -> Dictionary:
 	return DOORS
 
 
+func _entry_aliases() -> Dictionary:
+	return ENTRY_ALIASES
+
+
 func _after_build() -> void:
-	_alias_entries()
 	_spawn_npcs()
-
-
-func _alias_entries() -> void:
-	for digit_name: String in ENTRY_ALIASES:
-		var source := get_node_or_null(digit_name) as Marker2D
-		if source == null:
-			continue
-		var alias := Marker2D.new()
-		alias.name = ENTRY_ALIASES[digit_name]
-		alias.position = source.position
-		add_child(alias)
 
 
 ## NPCs must be direct children — Main._connect_area_npcs scans get_children().
