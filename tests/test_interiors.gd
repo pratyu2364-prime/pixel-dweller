@@ -96,3 +96,38 @@ func test_interior_entry_cells_walkable_and_clear_of_door() -> void:
 			var entry_pos: Vector2 = entries["Entry1"]
 			var gap: float = (entry_pos - MapBuilder.cell_center(cell)).length()
 			assert_gt(gap, 40.0, "%s entry clear of door trigger zone" % key)
+
+
+func test_interiors_have_residents() -> void:
+	var expected := {"shop": "shopkeeper_sana", "neighbor_house": "neighbor_yuki"}
+	for key: String in expected:
+		var interior: Node2D = (load(INTERIOR_SCENES[key]) as PackedScene).instantiate()
+		add_child_autofree(interior)
+		await get_tree().process_frame
+
+		var found := false
+		for child in interior.get_children():
+			if child is Npc:
+				found = true
+				assert_eq((child as Npc).npc_id, expected[key], "%s resident id" % key)
+				assert_not_null((child as Npc).sprite_texture, "resident has skin")
+		assert_true(found, "%s has a resident" % key)
+
+
+func test_interiors_have_furniture_props() -> void:
+	for key: String in INTERIOR_KEYS:
+		var interior: Node2D = (load(INTERIOR_SCENES[key]) as PackedScene).instantiate()
+		add_child_autofree(interior)
+		await get_tree().process_frame
+
+		var sprites := 0
+		for child in interior.get_children():
+			if child is Sprite2D:
+				sprites += 1
+		assert_gt(sprites, 4, "%s has furniture sprites" % key)
+
+
+func test_resident_cells_not_on_entry() -> void:
+	assert_ne(ShopMap.RESIDENT["cell"], Vector2i(10, 9), "shopkeeper not on entry")
+	var parsed := MapBuilder.parse(ShopMap.LAYOUT)
+	assert_false((parsed["entries"] as Dictionary).size() > 1, "shop has single entry digit")

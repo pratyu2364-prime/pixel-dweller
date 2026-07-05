@@ -9,10 +9,10 @@ const DOORS := {
 
 const LAYOUT := """
 ####################
-#pp##pp##pp##pp##pp#
+#poqoxppppppppxoqop#
+#puppppppppppppppup#
 #pppppppppppppppppp#
-#pppppppppppppppppp#
-#pp####pppp####pppp#
+#pppppnnnnnnnnppppp#
 #pppppppppppppppppp#
 #pppppppppppppppppp#
 #pppppppppppppppppp#
@@ -24,9 +24,20 @@ const LAYOUT := """
 """
 
 
+const RESIDENT := {
+	"id": "shopkeeper_sana", "type": "shopkeeper", "cell": Vector2i(9, 3),
+	"greeting": "Welcome to my store! I'm Sana. Everything a dweller could need!",
+	"repeat": "Take your time, look around!",
+}
+
+
 func _layout() -> String:
 	return LAYOUT
 
 
 func _door_table() -> Dictionary:
 	return DOORS
+
+
+func _after_build() -> void:
+	_spawn_resident(RESIDENT, "res://assets/character/samurai_green.png")
