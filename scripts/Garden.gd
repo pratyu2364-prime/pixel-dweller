@@ -1,11 +1,73 @@
-extends Node2D
+class_name GardenMap
+extends AreaMap
 
-@export var area_bounds: Rect2 = Rect2(-600, -750, 1200, 1500)
-@export var camera_zoom: float = 0.0
+## The garden between House and City — tiled park with pond and flower beds.
+## Growth decorations (apply_world_stage) land here as the dweller grows up.
+
+const DOORS := {
+	Vector2i(1, 20): {"target_area": "house", "target_entry": "EntryFromGarden"},
+	Vector2i(48, 20): {"target_area": "town", "target_entry": "EntryFromGarden"},
+}
+
+const ENTRY_ALIASES := {
+	"Entry1": "EntryFromHouse",
+	"Entry2": "EntryFromTownGarden",
+}
+
+const LAYOUT := """
+##################################################
+#t.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.t#
+#,..........,..........,..........,..........,..t#
+#t.....,..........,..........,..........,........#
+#t,..........,..........,..........,..........,.t#
+#.......,..........,..........,.....wwwwwwwww...t#
+#t.,..........,.t........,..........wwwwwwwww..,.#
+#t.......,..........,..........,....wwwwwwwww...t#
+#...,...fffffff,..........,.t.......wwwwwwwww...t#
+#t......fffffff......,..........,...wwwwwwwww....#
+#t...,..fffffff.,..........,........wwwwwwwww...t#
+#..........,..........,..........,..wwwwwwwww...t#
+#t....,..........,..........,..........,.........#
+#t..........,..........,..........,..........,..t#
+#......,..........,..........,..........,.......t#
+#t,..........,..........,..........,..........,..#
+#t......,..........,..........,..........,......t#
+#..,..........,..........,..........,..........,t#
+#t.......,..........,..........,..........,......#
+#rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#
+#Drr1rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr2rrD#
+#rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr#
+#t.........,..........,..........,..........,...t#
+#.....,..........,..........,..........,........t#
+#t..........,..........,..........,..........,...#
+#t.....,..........,..........,..........,.......t#
+#.,.......t..,..........,.........fffffff.....,.t#
+#t......,..........,..........,...fffffff,.......#
+#t.,..........,.....fffffff.......fffffff......,t#
+#........,..........fffffff....,..........,.....t#
+#t..,..........,....fffffff..........,..........,#
+#t........,..........,..........,..........,....t#
+#....,.t........,..........,..........,....t....t#
+#t.........,..........,.......t..,..........,....#
+#t....,..........,..........,..........,........t#
+#,..........,..........,..........,..........,..t#
+#t.....,..........,..........,..........,........#
+#t,..........,..........,..........,..........,.t#
+#ttt.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt#
+##################################################
+"""
 
 
-func get_area_bounds() -> Rect2:
-	return area_bounds
+func _layout() -> String:
+	return LAYOUT
+
+
+func _door_table() -> Dictionary:
+	return DOORS
+
+
+func _entry_aliases() -> Dictionary:
+	return ENTRY_ALIASES
 
 
 func apply_world_stage(stage_index: int) -> void:
@@ -24,7 +86,7 @@ func _add_tree() -> void:
 		Vector2(-30, 0), Vector2(30, 0), Vector2(0, -60),
 	])
 	tree.color = Color(0.0, 0.6, 0.0)
-	tree.position = Vector2(200, -100)
+	tree.position = Vector2(560, 240)
 	add_child(tree)
 
 
@@ -37,5 +99,5 @@ func _add_flowers() -> void:
 		Vector2(-15, -8), Vector2(15, -8), Vector2(8, 8), Vector2(-8, 8),
 	])
 	flowers.color = Color(1.0, 0.5, 0.8)
-	flowers.position = Vector2(-200, 150)
+	flowers.position = Vector2(250, 420)
 	add_child(flowers)

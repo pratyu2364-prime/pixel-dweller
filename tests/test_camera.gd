@@ -34,10 +34,12 @@ func test_attach_clamps_to_area_bounds() -> void:
 	add_child_autofree(player)
 	add_child_autofree(area)
 	var camera := CameraRig.attach(player, area)
-	assert_eq(camera.limit_left, -600)
-	assert_eq(camera.limit_top, -750)
-	assert_eq(camera.limit_right, 600)
-	assert_eq(camera.limit_bottom, 750)
+	var bounds: Rect2 = area.get_area_bounds()
+	assert_gt(bounds.size.x, 0.0, "garden bounds non-empty")
+	assert_eq(camera.limit_left, int(bounds.position.x))
+	assert_eq(camera.limit_top, int(bounds.position.y))
+	assert_eq(camera.limit_right, int(bounds.end.x))
+	assert_eq(camera.limit_bottom, int(bounds.end.y))
 
 
 func test_attach_honors_area_zoom_override() -> void:

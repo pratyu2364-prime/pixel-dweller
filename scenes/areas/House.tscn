@@ -1,56 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/World.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/Door.tscn" id="2_door"]
-
-[sub_resource type="RectangleShape2D" id="1"]
-size = Vector2(32, 1500)
-
-[sub_resource type="RectangleShape2D" id="2"]
-size = Vector2(1264, 32)
+[ext_resource type="Script" path="res://scripts/House.gd" id="1"]
 
 [node name="House" type="Node2D"]
 script = ExtResource("1")
 camera_zoom = 2.5
-
-[node name="Floor" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-600, -750, 600, -750, 600, 750, -600, 750)
-color = Color(0.2, 0.4, 0.2, 1)
-
-[node name="WallLeft" type="StaticBody2D" parent="."]
-collision_layer = 1
-position = Vector2(-616, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft"]
-shape = SubResource("1")
-
-[node name="WallRight" type="StaticBody2D" parent="."]
-collision_layer = 1
-position = Vector2(616, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
-shape = SubResource("1")
-
-[node name="WallTop" type="StaticBody2D" parent="."]
-collision_layer = 1
-position = Vector2(0, -766)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallTop"]
-shape = SubResource("2")
-
-[node name="WallBottom" type="StaticBody2D" parent="."]
-collision_layer = 1
-position = Vector2(0, 766)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallBottom"]
-shape = SubResource("2")
-
-[node name="EntryDefault" type="Marker2D" parent="."]
-
-[node name="EntryFromGarden" type="Marker2D" parent="."]
-position = Vector2(500, 80)
-
-[node name="DoorToGarden" parent="." instance=ExtResource("2_door")]
-position = Vector2(500, 0)
-target_area = "garden"
-target_entry = "EntryFromHouse"

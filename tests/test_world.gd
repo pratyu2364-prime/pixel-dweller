@@ -6,11 +6,13 @@ func test_house_has_walls_and_entry() -> void:
 	add_child_autofree(house)
 	await get_tree().process_frame
 
-	var static_bodies := []
-	for child in house.get_children():
-		if child is StaticBody2D:
-			static_bodies.append(child)
-	assert_gt(static_bodies.size(), 3, "House has >= 4 StaticBody2D walls")
+	assert_not_null(house.get_node_or_null("Map"), "House builds a TileMapLayer")
+	var parsed := MapBuilder.parse(HouseMap.LAYOUT)
+	var size: Vector2i = parsed["size"]
+	for x in size.x:
+		assert_true(MapBuilder.is_solid(parsed, Vector2i(x, 0)), "top boundary solid")
+	for y in size.y:
+		assert_true(MapBuilder.is_solid(parsed, Vector2i(0, y)), "left boundary solid")
 
 	var entry := house.get_node_or_null("EntryDefault")
 	assert_not_null(entry, "House has Marker2D named EntryDefault")
