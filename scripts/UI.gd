@@ -113,6 +113,11 @@ func set_area_label(area_name: String) -> void:
 	area_label.text = pretty_area_name(area_name)
 
 
+## Raw text, no key prettifying — used for city district names.
+func set_area_label_text(text: String) -> void:
+	area_label.text = text
+
+
 func show_dialog(text: String) -> void:
 	dialog_label.text = text
 	dialog_label.visible = true
