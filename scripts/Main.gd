@@ -16,10 +16,12 @@ func _ready() -> void:
 	_met_npcs = SaveManager.load_met_npcs()
 	SaveManager.load_stats(stats)
 	$UI.bind_stats(stats)
+	stats.changed.connect(_sync_player_stats)
 	var saved_area: String = SaveManager.load_current_area()
 	area_manager.load_area(saved_area, "EntryDefault", area_container)
 	_connect_area_doors()
 	_connect_area_npcs()
+	_sync_player_stats()
 
 	if $UI.dweller != null:
 		$UI._apply_stage_to_area($UI.dweller.stage)
@@ -34,6 +36,12 @@ func _process(delta: float) -> void:
 		return
 	_district_accum = 0.0
 	_update_district_label()
+
+
+func _sync_player_stats() -> void:
+	var player := area_manager.get_player()
+	if player != null:
+		player.attack_power = stats.attack
 
 
 ## In areas with districts (the city), the label tracks where the player walks.
@@ -119,6 +127,7 @@ func _finish_transition(target_area: String, target_entry: String) -> void:
 	area_manager.load_area(target_area, target_entry, area_container)
 	_connect_area_doors()
 	_connect_area_npcs()
+	_sync_player_stats()
 	_active_npc = null
 
 	if $UI.dweller != null:
