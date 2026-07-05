@@ -1,10 +1,14 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
 [ext_resource type="Texture2D" path="res://assets/character/ninja_blue.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://assets/weapons/sword_in_hand.png" id="3_sword"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(12, 10)
+
+[sub_resource type="RectangleShape2D" id="5"]
+size = Vector2(22, 22)
 
 [sub_resource type="RectangleShape2D" id="2"]
 size = Vector2(64, 64)
@@ -28,6 +32,35 @@ vframes = 7
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 6)
 shape = SubResource("1")
+
+[node name="SwordArea" type="Area2D" parent="."]
+monitoring = false
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SwordArea"]
+shape = SubResource("5")
+
+[node name="SwordSprite" type="Sprite2D" parent="."]
+visible = false
+texture_filter = 1
+scale = Vector2(2, 2)
+texture = ExtResource("3_sword")
+
+[node name="TouchAttack" type="Control" parent="."]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -144.0
+offset_top = -144.0
+offset_right = 0.0
+offset_bottom = 0.0
+
+[node name="BtnAttack" type="TouchScreenButton" parent="TouchAttack"]
+position = Vector2(40, 40)
+shape = SubResource("4")
+action = "attack"
 
 [node name="TouchDPad" type="Control" parent="."]
 anchor_left = 0.0
