@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+signal damaged(amount: int)
+
 ## Ninja Adventure sprite sheet layout (sprite.png 64x112, 16x16 frames):
 ## columns = direction, rows = animation frame. Walk cycle = rows 0..3,
 ## row 4 = attack pose.
@@ -11,6 +13,7 @@ const WALK_ROWS := [0, 1, 2, 3]
 const ATTACK_ROW := 4
 const ANIM_FPS := 8.0
 const ATTACK_TIME := 0.25
+const INVULN_TIME := 0.8
 
 @export var speed: float = 70.0
 ## Injected by Main from Stats on spawn; damage dealt per sword hit.
@@ -19,6 +22,7 @@ const ATTACK_TIME := 0.25
 var _facing_col: int = COL_DOWN
 var _anim_t: float = 0.0
 var _attack_t: float = 0.0
+var _invuln_t: float = 0.0
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var sword_area: Area2D = $SwordArea
@@ -50,10 +54,27 @@ func is_attacking() -> bool:
 
 
 func _ready() -> void:
+	add_to_group("player")
 	sword_area.body_entered.connect(_on_sword_hit)
 
 
+## Contact damage entry point for enemies. Invulnerability window prevents
+## per-frame drain while overlapping.
+func hurt(amount: int) -> void:
+	if _invuln_t > 0.0:
+		return
+	_invuln_t = INVULN_TIME
+	damaged.emit(amount)
+
+
 func _physics_process(delta: float) -> void:
+	if _invuln_t > 0.0:
+		_invuln_t -= delta
+		# Blink while invulnerable so the hit reads clearly.
+		sprite.visible = int(_invuln_t * 10.0) % 2 == 0
+		if _invuln_t <= 0.0:
+			sprite.visible = true
+
 	if is_attacking():
 		_attack_t -= delta
 		velocity = Vector2.ZERO
