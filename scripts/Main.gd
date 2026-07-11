@@ -40,8 +40,15 @@ func _process(delta: float) -> void:
 
 func _sync_player_stats() -> void:
 	var player := area_manager.get_player()
-	if player != null:
-		player.attack_power = stats.attack
+	if player == null:
+		return
+	player.attack_power = stats.attack
+	if not player.damaged.is_connected(_on_player_damaged):
+		player.damaged.connect(_on_player_damaged)
+
+
+func _on_player_damaged(amount: int) -> void:
+	stats.take_damage(amount)
 
 
 ## In areas with districts (the city), the label tracks where the player walks.
