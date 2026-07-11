@@ -14,8 +14,8 @@ default_worker: opencode/big-pickle   # primary codegen model
 escalation_worker: hermes/grok        # used after 2 failed attempts
 reviewer: claude         # only Claude reviews/merges
 retry_cap: 2             # attempts before escalating model
-date: 2026-07-05
-tasks_merged_today: 6
+date: 2026-07-11
+tasks_merged_today: 1
 ```
 
 ## Legend
@@ -51,15 +51,16 @@ tasks_merged_today: 6
 | P3-4 | 3 | Enterable buildings (interiors) | done | claude | #22 | 1 | Shop + NeighborHouse; AreaMap base |
 | P3-5 | 3 | Populate city: NPCs + districts | done | claude | #23 | 1 | 6 NPCs; 8 districts; live label |
 | P3-6 | 3 | Phase 3 polish + ship | done | claude | #24 | 1 | full tour + door-graph invariant; ship |
-| P6-1 | 6 | Player stats + hearts HUD | todo | claude | — | 0 | COMBAT PIVOT (owner: full freedom) |
-| P6-2 | 6 | Sword attack | todo | claude | — | 0 | swing hitbox + anim |
-| P6-3 | 6 | Enemy framework + Slime | todo | claude | — | 0 | wander/chase/hurt/die |
+| P6-1 | 6 | Player stats + hearts HUD | done | claude | #35 | 1 | COMBAT PIVOT (owner: full freedom) |
+| P6-2 | 6 | Sword attack | done | claude | #36 | 1 | swing hitbox + anim |
+| P6-3 | 6 | Enemy framework + Slime | done | claude | #37 | 1 | wander/chase/hurt/die; player invuln+blink |
 | P6-4 | 6 | Whispering Woods danger area | todo | claude | — | 0 | enemies only there; town safe |
 | P6-5 | 6 | Loot, XP, levels | todo | claude | — | 0 | coins+xp; level curve |
 | P6-6 | 6 | Shop upgrades | todo | claude | — | 0 | sword/armor tiers via Sana |
 | P6-7 | 6 | Boss + polish + ship | todo | claude | — | 0 | Giant Frog; balance; deploy |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-11 — P6-3 → done PR#37 — lead; Enemy framework (wander/chase/hurt/die pure fns, contact dmg, knockback, poof death) + Slime; player hurt() w/ 0.8s invuln+blink wired to Stats hearts; 145 tests. Backfilled tracker: P6-1 done #35, P6-2 done #36.
 - 2026-07-05 — Phase 6 aligned: COMBAT ADVENTURE (owner grants full freedom: health/armor/swords/levels/enemies/boss). Kid-friendly tone. 7 tasks P6-1..P6-7. Assets: Ninja Adventure monsters/weapons/hearts via ZeldaCourse mirror.
 - 2026-07-05 — P5-4 → done PR#34 — lead; map extended 100→140 wide: East Orchard district (tree rows, lake w/ banks, 7 farm houses, 2 new NPCs: Ines, Momo); .gdlintrc 150-col for layout rows; 128 tests
 - 2026-07-05 — P5-3 → done PR#33 — lead; furnished interiors (8 furniture props) + residents Sana (shop) & Yuki (neighbor house) with met-tracking
