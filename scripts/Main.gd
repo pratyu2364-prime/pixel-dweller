@@ -30,6 +30,8 @@ func _ready() -> void:
 		$UI.set_area_label(area_manager.current_area)
 
 	$UI.talk_button.pressed.connect(_on_talk_pressed)
+	$UI.buy_sword_button.pressed.connect(_on_buy_sword_pressed)
+	$UI.buy_armor_button.pressed.connect(_on_buy_armor_pressed)
 
 
 func _process(delta: float) -> void:
@@ -189,6 +191,23 @@ func _on_npc_greeted(text: String, mood_boost: float) -> void:
 func _on_npc_range_changed(in_range: bool, npc: Npc) -> void:
 	_active_npc = npc if in_range else null
 	$UI.set_talk_button_visible(in_range)
+	$UI.set_shop_buttons_visible(in_range and npc.npc_type == "shopkeeper")
+
+
+func _on_buy_sword_pressed() -> void:
+	if stats.buy_sword():
+		$UI.show_dialog("A fine choice! Your %s is ready!" % Stats.SWORD_TIERS[stats.sword_tier]["name"])
+		$UI._save()
+	else:
+		$UI.show_dialog("Come back with more coins — the slimes drop them!")
+
+
+func _on_buy_armor_pressed() -> void:
+	if stats.buy_armor():
+		$UI.show_dialog("Looking sturdy! %s equipped!" % Stats.ARMOR_TIERS[stats.armor_tier]["name"])
+		$UI._save()
+	else:
+		$UI.show_dialog("Come back with more coins — the slimes drop them!")
 
 
 func _on_talk_pressed() -> void:

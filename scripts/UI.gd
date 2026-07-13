@@ -24,6 +24,8 @@ var stats: Stats
 @onready var area_label: Label = $Margin/VBox/AreaLabel
 @onready var dialog_label: Label = $Margin/VBox/DialogLabel
 @onready var talk_button: Button = $Margin/VBox/Buttons/Talk
+@onready var buy_sword_button: Button = $Margin/VBox/Buttons/BuySword
+@onready var buy_armor_button: Button = $Margin/VBox/Buttons/BuyArmor
 @onready var dialog_timer: Timer = $DialogTimer
 
 var _autosave_timer: float = 0.0
@@ -93,6 +95,8 @@ func _refresh_hearts() -> void:
 		return
 	if loot_label != null:
 		loot_label.text = loot_text(stats.level, stats.xp, stats.coins)
+	if buy_sword_button != null and buy_sword_button.visible:
+		refresh_shop_buttons()
 	for child in hearts_row.get_children():
 		child.queue_free()
 	for state: String in Stats.hearts(stats.hp, stats.max_hp):
@@ -150,6 +154,32 @@ func set_area_label(area_name: String) -> void:
 ## Raw text, no key prettifying — used for city district names.
 func set_area_label_text(text: String) -> void:
 	area_label.text = text
+
+
+## Shop ------------------------------------------------------------------
+
+## Pure: button text for the next tier on sale ("Best!" when maxed).
+static func offer_label(kind: String, tiers: Array, tier_now: int) -> String:
+	var offer := Stats.next_tier(tiers, tier_now)
+	if offer.is_empty():
+		return "%s: Best!" % kind
+	return "%s  %dc" % [offer["name"], int(offer["cost"])]
+
+
+func set_shop_buttons_visible(visible_now: bool) -> void:
+	buy_sword_button.visible = visible_now
+	buy_armor_button.visible = visible_now
+	if visible_now:
+		refresh_shop_buttons()
+
+
+func refresh_shop_buttons() -> void:
+	if stats == null:
+		return
+	buy_sword_button.text = offer_label("Sword", Stats.SWORD_TIERS, stats.sword_tier)
+	buy_armor_button.text = offer_label("Armor", Stats.ARMOR_TIERS, stats.armor_tier)
+	buy_sword_button.disabled = not Stats.can_afford(Stats.SWORD_TIERS, stats.sword_tier, stats.coins)
+	buy_armor_button.disabled = not Stats.can_afford(Stats.ARMOR_TIERS, stats.armor_tier, stats.coins)
 
 
 func show_dialog(text: String) -> void:
