@@ -13,6 +13,7 @@ var dweller: Dweller
 var stats: Stats
 
 @onready var hearts_row: HBoxContainer = $Margin/VBox/HeartsRow
+@onready var loot_label: Label = $Margin/VBox/LootLabel
 @onready var hunger_bar: ProgressBar = $Margin/VBox/HungerBar
 @onready var energy_bar: ProgressBar = $Margin/VBox/EnergyBar
 @onready var mood_bar: ProgressBar = $Margin/VBox/MoodBar
@@ -82,9 +83,16 @@ func bind_stats(new_stats: Stats) -> void:
 	_refresh_hearts()
 
 
+## Pure: one-line level/xp/coin readout. Unit-testable.
+static func loot_text(level: int, xp: int, coins: int) -> String:
+	return "Lv %d   XP %d/%d   Coins %d" % [level, xp, Stats.xp_for_next(level), coins]
+
+
 func _refresh_hearts() -> void:
 	if hearts_row == null or stats == null:
 		return
+	if loot_label != null:
+		loot_label.text = loot_text(stats.level, stats.xp, stats.coins)
 	for child in hearts_row.get_children():
 		child.queue_free()
 	for state: String in Stats.hearts(stats.hp, stats.max_hp):
