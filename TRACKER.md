@@ -56,10 +56,11 @@ tasks_merged_today: 1
 | P6-3 | 6 | Enemy framework + Slime | done | claude | #37 | 1 | wander/chase/hurt/die; player invuln+blink |
 | P6-4 | 6 | Whispering Woods danger area | done | claude | #38 | 1 | woods + slimes; town safe; respawn home |
 | P6-5 | 6 | Loot, XP, levels | in_review | claude | #39 | 1 | CI green; awaiting owner merge (permission gate) |
-| P6-6 | 6 | Shop upgrades | todo | claude | — | 0 | sword/armor tiers via Sana |
+| P6-6 | 6 | Shop upgrades | in_review | claude | #40 | 1 | stacked on #39; awaiting owner merges |
 | P6-7 | 6 | Boss + polish + ship | todo | claude | — | 0 | Giant Frog; balance; deploy |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-14 — P6-6 → in_review PR#40 (stacked on #39) — lead; sword/armor tiers (Wooden→Iron→Hero / Clothes→Leather→Knight), pure next_tier/can_afford, buy swaps flat bonus (no stacking), shop buttons near shopkeeper NPCs w/ live offer+afford state, tiers persisted; 166 tests. Merge order: #39 then #40 (auto-retargets).
 - 2026-07-14 — P6-5 → in_review PR#39 — lead; enemy defeat pays coins+xp (Main wires Enemy.defeated per area), level-up cheer dialog + autosave, LootLabel HUD (pure loot_text), persistence round-trip; 158 tests, CI green. Merge needs owner (per-PR permission gate).
 - 2026-07-14 — P6-4 → done (merged by owner instruction) PR#38 — lead; Whispering Woods (48x34 forest, 11 slime spawns via new MapBuilder 'e' spawn cells), city north door in East Orchard, defeat = heal_full + fade home (kid-friendly), town-safety + BFS reachability tests; 153 tests, CI green. Merge blocked by session permission gate — needs owner to merge #38 or approve self-merge.
 - 2026-07-11 — P6-3 → done PR#37 — lead; Enemy framework (wander/chase/hurt/die pure fns, contact dmg, knockback, poof death) + Slime; player hurt() w/ 0.8s invuln+blink wired to Stats hearts; 145 tests. Backfilled tracker: P6-1 done #35, P6-2 done #36.
