@@ -2,7 +2,7 @@ extends GutTest
 
 const TEST_PATH := "user://test_full_tour_save.json"
 
-const ALL_AREAS := ["house", "garden", "town", "shop", "neighbor_house"]
+const ALL_AREAS := ["house", "garden", "town", "shop", "neighbor_house", "woods"]
 
 ## The Phase 3 walk: home -> garden -> city -> shop -> city -> neighbor -> back.
 const TOUR := [
@@ -13,6 +13,8 @@ const TOUR := [
 	{"area": "town", "entry": "EntryFromShop"},
 	{"area": "neighbor_house", "entry": "EntryDefault"},
 	{"area": "town", "entry": "EntryFromNeighborHouse"},
+	{"area": "woods", "entry": "EntryFromTown"},
+	{"area": "town", "entry": "EntryFromWoods"},
 	{"area": "garden", "entry": "EntryFromTownGarden"},
 	{"area": "house", "entry": "EntryFromGarden"},
 ]
@@ -80,7 +82,7 @@ func test_door_graph_is_consistent() -> void:
 				marker,
 				"%s -> %s: entry %s exists" % [area, door.target_area, door.target_entry]
 			)
-	assert_gte(doors_seen, 7, "all doors covered (house, garden x2, city x3, interiors x2)")
+	assert_gte(doors_seen, 9, "all doors covered (house, garden x2, city x4, interiors x2, woods)")
 
 
 func test_boot_with_unknown_entry_falls_back() -> void:

@@ -18,6 +18,12 @@ func test_parse_size_and_rows() -> void:
 	assert_eq((parsed["rows"] as PackedStringArray).size(), 8)
 
 
+func test_parse_collects_enemy_spawns() -> void:
+	var parsed := MapBuilder.parse("....\n.e.e\n....")
+	assert_eq(parsed["spawns"], [Vector2i(1, 1), Vector2i(3, 1)] as Array[Vector2i])
+	assert_false(MapBuilder.is_solid(parsed, Vector2i(1, 1)), "spawn cell walkable")
+
+
 func test_parse_pads_short_rows_with_grass() -> void:
 	var parsed := MapBuilder.parse("##\n#")
 	assert_eq(parsed["size"], Vector2i(2, 2))

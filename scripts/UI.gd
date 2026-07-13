@@ -129,6 +129,8 @@ static func pretty_area_name(key: String) -> String:
 			return "Garden"
 		"town":
 			return "Town"
+		"woods":
+			return "Whispering Woods"
 		_:
 			return key.capitalize()
 

@@ -10,6 +10,7 @@ const DOORS := {
 	Vector2i(3, 87): {"target_area": "garden", "target_entry": "EntryFromTownGarden"},
 	Vector2i(41, 35): {"target_area": "shop", "target_entry": "EntryDefault"},
 	Vector2i(42, 93): {"target_area": "neighbor_house", "target_entry": "EntryDefault"},
+	Vector2i(116, 0): {"target_area": "woods", "target_entry": "EntryFromTown"},
 }
 
 ## MapBuilder digit entries -> semantic marker names other areas target.
@@ -17,6 +18,7 @@ const ENTRY_ALIASES := {
 	"Entry1": "EntryFromGarden",
 	"Entry3": "EntryFromShop",
 	"Entry4": "EntryFromNeighborHouse",
+	"Entry5": "EntryFromWoods",
 }
 
 ## Ordered world-px regions; first hit wins. East district, bands, quadrants.
@@ -61,8 +63,8 @@ const NPCS := [
 ]
 
 const LAYOUT := """
-############################################################################################################################################
-#t.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.t...t.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.t#
+####################################################################################################################D#######################
+#t.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.tt.tt.tt.tt.tt.tt.tt,tt.tt.tt.tt.t...t.tt.tt.tt.tt5tt,tt.tt.tt.tt.tt.tt.tt.t#
 #,..........,..........,....rrrr..,..........,..........,..........,rrrr......,..........,..........,..........,..........,..........,....t#
 #t.....,..........,.........rrrr........,..........,..........,.....rrrr.,..........,..........,..........,..........,..........,..........#
 #t,..........,..........,...rrrr...,..........,..........,..........rrrr.......,..t......t,f.........,..t...t...t...t...t..,t...t...t.,...t#

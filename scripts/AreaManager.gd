@@ -12,6 +12,7 @@ var _area_scenes: Dictionary = {
 	"town": "res://scenes/areas/City.tscn",
 	"shop": "res://scenes/areas/Shop.tscn",
 	"neighbor_house": "res://scenes/areas/NeighborHouse.tscn",
+	"woods": "res://scenes/areas/Woods.tscn",
 }
 
 
