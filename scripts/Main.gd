@@ -17,6 +17,7 @@ func _ready() -> void:
 	SaveManager.load_stats(stats)
 	$UI.bind_stats(stats)
 	stats.changed.connect(_sync_player_stats)
+	stats.died.connect(_on_player_defeated)
 	var saved_area: String = SaveManager.load_current_area()
 	area_manager.load_area(saved_area, "EntryDefault", area_container)
 	_connect_area_doors()
@@ -49,6 +50,18 @@ func _sync_player_stats() -> void:
 
 func _on_player_damaged(amount: int) -> void:
 	stats.take_damage(amount)
+
+
+## Kid-friendly defeat: no game over — wake up at home with full hearts.
+func _on_player_defeated() -> void:
+	if _transitioning:
+		return
+	stats.heal_full()
+	_transitioning = true
+	_disconnect_area_doors()
+	_disconnect_area_npcs()
+	$UI.show_dialog("You got dizzy... but you woke up safe at home!")
+	_do_fade_transition("house", "EntryDefault")
 
 
 ## In areas with districts (the city), the label tracks where the player walks.

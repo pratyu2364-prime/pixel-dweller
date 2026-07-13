@@ -78,7 +78,8 @@ const PAVED_CHARS := "bp"
 
 
 ## Pure: layout text -> structured map data. Unit-testable, no scene tree needed.
-## Returns {size, rows, entries, doors, props: [{char, cell}], solid_extra: {cell: true}}.
+## Returns {size, rows, entries, doors, spawns, props: [{char, cell}],
+## solid_extra: {cell: true}}. 'e' cells mark enemy spawn points.
 static func parse(layout: String) -> Dictionary:
 	var rows := PackedStringArray()
 	var width := 0
@@ -91,6 +92,7 @@ static func parse(layout: String) -> Dictionary:
 
 	var entries: Dictionary = {}
 	var doors: Array[Vector2i] = []
+	var spawns: Array[Vector2i] = []
 	var props: Array[Dictionary] = []
 	var solid_extra: Dictionary = {}
 	for y in rows.size():
@@ -102,6 +104,8 @@ static func parse(layout: String) -> Dictionary:
 				entries["Entry" + ch] = cell_center(Vector2i(x, y))
 			elif ch == "D":
 				doors.append(Vector2i(x, y))
+			elif ch == "e":
+				spawns.append(Vector2i(x, y))
 			elif PROP_DEFS.has(ch):
 				props.append({"char": ch, "cell": Vector2i(x, y)})
 				if PROP_DEFS[ch]["solid"]:
@@ -115,6 +119,7 @@ static func parse(layout: String) -> Dictionary:
 		"rows": rows,
 		"entries": entries,
 		"doors": doors,
+		"spawns": spawns,
 		"props": props,
 		"solid_extra": solid_extra,
 	}
