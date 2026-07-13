@@ -133,3 +133,19 @@ size_flags_horizontal = 3
 size_flags_vertical = 6
 custom_min_size = Vector2(0, 72)
 text = "Talk"
+
+[node name="BuySword" type="Button" parent="Margin/VBox/Buttons"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+custom_min_size = Vector2(0, 72)
+text = "Sword"
+
+[node name="BuyArmor" type="Button" parent="Margin/VBox/Buttons"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+custom_min_size = Vector2(0, 72)
+text = "Armor"

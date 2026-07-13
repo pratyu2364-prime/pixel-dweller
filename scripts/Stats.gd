@@ -10,6 +10,18 @@ signal died
 const BASE_MAX_HP := 6
 const BASE_ATTACK := 1
 
+## Gear tiers sold by the shop. Buying the next tier swaps the flat bonus.
+const SWORD_TIERS := [
+	{"name": "Wooden Sword", "bonus": 0, "cost": 0},
+	{"name": "Iron Sword", "bonus": 2, "cost": 30},
+	{"name": "Hero Sword", "bonus": 5, "cost": 100},
+]
+const ARMOR_TIERS := [
+	{"name": "Play Clothes", "bonus": 0, "cost": 0},
+	{"name": "Leather Vest", "bonus": 1, "cost": 25},
+	{"name": "Knight Armor", "bonus": 3, "cost": 80},
+]
+
 var max_hp: int = BASE_MAX_HP
 var hp: int = BASE_MAX_HP
 var attack: int = BASE_ATTACK
@@ -17,6 +29,8 @@ var defense: int = 0
 var coins: int = 0
 var xp: int = 0
 var level: int = 1
+var sword_tier: int = 0
+var armor_tier: int = 0
 
 
 ## Pure: cumulative xp needed to reach the NEXT level from `level`.
@@ -57,6 +71,39 @@ func heal_full() -> void:
 	changed.emit()
 
 
+## Pure: next tier for sale, or {} when maxed out.
+static func next_tier(tiers: Array, tier_now: int) -> Dictionary:
+	return {} if tier_now + 1 >= tiers.size() else tiers[tier_now + 1]
+
+
+## Pure: can the purse afford the next tier?
+static func can_afford(tiers: Array, tier_now: int, purse: int) -> bool:
+	var offer := next_tier(tiers, tier_now)
+	return not offer.is_empty() and purse >= int(offer["cost"])
+
+
+func buy_sword() -> bool:
+	if not can_afford(SWORD_TIERS, sword_tier, coins):
+		return false
+	var offer := next_tier(SWORD_TIERS, sword_tier)
+	coins -= int(offer["cost"])
+	attack += int(offer["bonus"]) - int(SWORD_TIERS[sword_tier]["bonus"])
+	sword_tier += 1
+	changed.emit()
+	return true
+
+
+func buy_armor() -> bool:
+	if not can_afford(ARMOR_TIERS, armor_tier, coins):
+		return false
+	var offer := next_tier(ARMOR_TIERS, armor_tier)
+	coins -= int(offer["cost"])
+	defense += int(offer["bonus"]) - int(ARMOR_TIERS[armor_tier]["bonus"])
+	armor_tier += 1
+	changed.emit()
+	return true
+
+
 func gain_coins(amount: int) -> void:
 	coins += amount
 	changed.emit()
@@ -81,6 +128,7 @@ func to_dict() -> Dictionary:
 	return {
 		"max_hp": max_hp, "hp": hp, "attack": attack, "defense": defense,
 		"coins": coins, "xp": xp, "level": level,
+		"sword_tier": sword_tier, "armor_tier": armor_tier,
 	}
 
 
@@ -92,4 +140,6 @@ func from_dict(data: Dictionary) -> void:
 	coins = int(data.get("coins", 0))
 	xp = int(data.get("xp", 0))
 	level = int(data.get("level", 1))
+	sword_tier = int(data.get("sword_tier", 0))
+	armor_tier = int(data.get("armor_tier", 0))
 	changed.emit()
