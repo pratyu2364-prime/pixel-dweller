@@ -54,12 +54,13 @@ tasks_merged_today: 1
 | P6-1 | 6 | Player stats + hearts HUD | done | claude | #35 | 1 | COMBAT PIVOT (owner: full freedom) |
 | P6-2 | 6 | Sword attack | done | claude | #36 | 1 | swing hitbox + anim |
 | P6-3 | 6 | Enemy framework + Slime | done | claude | #37 | 1 | wander/chase/hurt/die; player invuln+blink |
-| P6-4 | 6 | Whispering Woods danger area | todo | claude | — | 0 | enemies only there; town safe |
+| P6-4 | 6 | Whispering Woods danger area | in_review | claude | #38 | 1 | CI green; awaiting merge (permission gate) |
 | P6-5 | 6 | Loot, XP, levels | todo | claude | — | 0 | coins+xp; level curve |
 | P6-6 | 6 | Shop upgrades | todo | claude | — | 0 | sword/armor tiers via Sana |
 | P6-7 | 6 | Boss + polish + ship | todo | claude | — | 0 | Giant Frog; balance; deploy |
 
 ## Activity log (newest first — agents append one line per action)
+- 2026-07-14 — P6-4 → in_review PR#38 — lead; Whispering Woods (48x34 forest, 11 slime spawns via new MapBuilder 'e' spawn cells), city north door in East Orchard, defeat = heal_full + fade home (kid-friendly), town-safety + BFS reachability tests; 153 tests, CI green. Merge blocked by session permission gate — needs owner to merge #38 or approve self-merge.
 - 2026-07-11 — P6-3 → done PR#37 — lead; Enemy framework (wander/chase/hurt/die pure fns, contact dmg, knockback, poof death) + Slime; player hurt() w/ 0.8s invuln+blink wired to Stats hearts; 145 tests. Backfilled tracker: P6-1 done #35, P6-2 done #36.
 - 2026-07-05 — Phase 6 aligned: COMBAT ADVENTURE (owner grants full freedom: health/armor/swords/levels/enemies/boss). Kid-friendly tone. 7 tasks P6-1..P6-7. Assets: Ninja Adventure monsters/weapons/hearts via ZeldaCourse mirror.
 - 2026-07-05 — P5-4 → done PR#34 — lead; map extended 100→140 wide: East Orchard district (tree rows, lake w/ banks, 7 farm houses, 2 new NPCs: Ines, Momo); .gdlintrc 150-col for layout rows; 128 tests
