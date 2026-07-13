@@ -22,6 +22,7 @@ func _ready() -> void:
 	area_manager.load_area(saved_area, "EntryDefault", area_container)
 	_connect_area_doors()
 	_connect_area_npcs()
+	_connect_area_enemies()
 	_sync_player_stats()
 
 	if $UI.dweller != null:
@@ -120,6 +121,22 @@ func _disconnect_area_npcs() -> void:
 				npc.range_changed.disconnect(_on_npc_range_changed)
 
 
+func _connect_area_enemies() -> void:
+	var area_node := area_manager.get_current_area_node()
+	if area_node == null:
+		return
+	for child in area_node.get_children():
+		if child is Enemy:
+			(child as Enemy).defeated.connect(_on_enemy_defeated)
+
+
+func _on_enemy_defeated(enemy: Enemy) -> void:
+	stats.gain_coins(enemy.coin_value)
+	if stats.gain_xp(enemy.xp_value):
+		$UI.show_dialog("Level up! You feel stronger. Lv %d!" % stats.level)
+	$UI._save()
+
+
 func _on_door_triggered(target_area: String, target_entry: String) -> void:
 	if _transitioning:
 		return
@@ -147,6 +164,7 @@ func _finish_transition(target_area: String, target_entry: String) -> void:
 	area_manager.load_area(target_area, target_entry, area_container)
 	_connect_area_doors()
 	_connect_area_npcs()
+	_connect_area_enemies()
 	_sync_player_stats()
 	_active_npc = null
 

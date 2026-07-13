@@ -57,6 +57,11 @@ func heal_full() -> void:
 	changed.emit()
 
 
+func gain_coins(amount: int) -> void:
+	coins += amount
+	changed.emit()
+
+
 ## Returns true if at least one level was gained. Leveling refills hearts.
 func gain_xp(amount: int) -> bool:
 	xp += amount
