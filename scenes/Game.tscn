@@ -1,9 +1,7 @@
 [gd_scene load_steps=2 format=3 uid="uid://cpenumbragame01"]
 
-[ext_resource type="Script" path="res://scripts/chamber/Chamber.gd" id="1_chamber"]
+[ext_resource type="Script" path="res://scripts/Game.gd" id="1_game"]
 
 [node name="Game" type="Node2D"]
-
-[node name="Chamber" type="Node2D" parent="."]
-script = ExtResource("1_chamber")
-chamber_path = "res://chambers/cistern.txt"
+script = ExtResource("1_game")
+start_chamber = "cistern"

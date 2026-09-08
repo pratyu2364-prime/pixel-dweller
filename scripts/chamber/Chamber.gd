@@ -24,6 +24,7 @@ var umbra: Umbra
 var cling: ClingController
 var hud: Hud
 var renderer: ChamberRenderer
+var wardens: Array[Warden] = []
 
 var _exit_fired: bool = false
 
@@ -42,6 +43,7 @@ func load_chamber(path: String) -> void:
 	_build_walls()
 	_spawn_renderer()
 	_spawn_umbra()
+	_spawn_wardens()
 	_spawn_hud()
 
 
@@ -109,6 +111,24 @@ func _attach_camera() -> void:
 	camera.limit_bottom = int(bounds.end.y)
 	umbra.add_child(camera)
 	camera.make_current()
+
+
+## Wardens are spawned after Umbra so their lanterns light a room she is
+## already standing in — no frame where the floor is dark by accident.
+func _spawn_wardens() -> void:
+	for definition in data.wardens:
+		var route := PatrolRoute.new(
+			definition["waypoints"], definition["mode"], definition["speed"]
+		)
+		if not route.is_valid():
+			push_error("Warden %s has an unwalkable beat" % definition["id"])
+			continue
+		var warden := Warden.new()
+		warden.name = String(definition["id"])
+		warden.lantern_radius = definition["lantern"]
+		add_child(warden)
+		warden.setup(String(definition["id"]), route, field, cling)
+		wardens.append(warden)
 
 
 const HUD_SCENE := preload("res://scenes/Hud.tscn")
