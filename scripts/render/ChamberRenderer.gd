@@ -10,6 +10,7 @@ const SHADER := preload("res://shaders/chamber.gdshader")
 var data: ChamberData
 var field: LightField
 
+var _pixels: PackedByteArray = PackedByteArray()
 var _image: Image
 var _texture: ImageTexture
 var _material: ShaderMaterial
@@ -29,6 +30,8 @@ func setup(p_data: ChamberData, p_field: LightField) -> void:
 	_material.set_shader_parameter("light_tex", _texture)
 	_material.set_shader_parameter("grid_size", Vector2(data.width, data.height))
 	_material.set_shader_parameter("shade_max", LightField.SHADE_MAX)
+	_material.set_shader_parameter("contrast_boost", 0.0)
+	_material.set_shader_parameter("flicker_amount", 1.0)
 	material = _material
 
 	# A blank 1x1 sprite stretched over the room: the shader paints everything.
@@ -43,20 +46,44 @@ func setup(p_data: ChamberData, p_field: LightField) -> void:
 	refresh()
 
 
+## High contrast widens the gap between shade and glare instead of recolouring
+## anything: the safety line stays exactly where the rules put it, it just gets
+## harder to misread.
+func set_high_contrast(enabled: bool) -> void:
+	if _material != null:
+		_material.set_shader_parameter("contrast_boost", 1.0 if enabled else 0.0)
+
+
+func set_reduced_motion(enabled: bool) -> void:
+	if _material != null:
+		_material.set_shader_parameter("flicker_amount", 0.0 if enabled else 1.0)
+
+
 ## Repacks the field into the texture. Called every frame — the grid is tiny
 ## (a room is ~40x22 texels), so this is cheaper than any per-cell node.
 func refresh() -> void:
 	if field == null or _image == null:
 		return
 	var levels := field.levels()
+	if _pixels.size() != data.width * data.height * 3:
+		_prime_static_channels()
+	# Only the light channel changes between frames; walls and the exit are
+	# baked once. Writing raw bytes avoids a Color per cell, every frame.
+	for i in levels.size():
+		_pixels[i * 3] = int(clampf(levels[i], 0.0, 1.0) * 255.0)
+	_image.set_data(data.width, data.height, false, Image.FORMAT_RGB8, _pixels)
+	_texture.update(_image)
+
+
+func _prime_static_channels() -> void:
+	_pixels = PackedByteArray()
+	_pixels.resize(data.width * data.height * 3)
 	for y in data.height:
 		for x in data.width:
 			var cell := Vector2i(x, y)
-			var level: float = levels[y * data.width + x]
-			var wall := 1.0 if data.is_wall(cell) else 0.0
-			var exit_mask := 1.0 if cell == data.exit else 0.0
-			_image.set_pixel(x, y, Color(level, wall, exit_mask))
-	_texture.update(_image)
+			var i := (y * data.width + x) * 3
+			_pixels[i + 1] = 255 if data.is_wall(cell) else 0
+			_pixels[i + 2] = 255 if cell == data.exit else 0
 
 
 ## Mirrors are drawn as glass, above the light pass: the one solid thing in a

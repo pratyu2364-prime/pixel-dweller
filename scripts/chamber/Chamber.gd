@@ -38,6 +38,7 @@ var pause_menu: PauseMenu
 var _camera: Camera2D
 var _shake: float = 0.0
 var progress: Progress
+var options: PlayerOptions = PlayerOptions.new()
 var _whispers_said: Dictionary = {}
 var _memories_taken: Dictionary = {}
 
@@ -240,6 +241,8 @@ func _on_quit() -> void:
 func _shake_camera(delta: float) -> void:
 	if _camera == null:
 		return
+	if options.reduced_motion:
+		_shake = 0.0
 	if _shake <= 0.0:
 		_camera.offset = Vector2.ZERO
 		return
@@ -338,13 +341,21 @@ func _check_memories() -> void:
 		return
 
 
-## Everything she has ever remembered, applied to this body.
+## Everything she has ever remembered, plus whatever the player has asked the
+## game to go easier on, applied to this body.
 func apply_boons() -> void:
-	if progress == null or umbra == null:
+	if umbra == null:
 		return
-	var boons := progress.boons()
+	var boons := {"coherence": 0.0, "ink": 0.0}
+	if progress != null:
+		boons = progress.boons()
 	umbra.state.bonus_coherence = boons["coherence"]
-	umbra.state.bonus_ink = boons["ink"]
+	umbra.state.bonus_ink = boons["ink"] + options.bonus_ink()
+	umbra.state.drain_scale = options.drain_multiplier()
+	if renderer != null:
+		renderer.set_high_contrast(options.high_contrast)
+	if sound != null:
+		sound.volume_scale = options.volume
 	umbra.state.coherence = minf(umbra.state.coherence, umbra.state.max_coherence())
 
 

@@ -16,6 +16,7 @@ enum Voice { CAST, SCATTER, REFORM, SNUFF, WHISPER, TURN }
 var _players: Array[AudioStreamPlayer] = []
 var _streams: Dictionary = {}
 var _next_player: int = 0
+var volume_scale: float = 1.0
 
 
 func _ready() -> void:
@@ -34,7 +35,9 @@ func play(voice: int, volume_db: float = -6.0) -> void:
 	var player := _players[_next_player]
 	_next_player = (_next_player + 1) % _players.size()
 	player.stream = _streams[voice]
-	player.volume_db = volume_db
+	if volume_scale <= 0.001:
+		return
+	player.volume_db = volume_db + linear_to_db(clampf(volume_scale, 0.001, 1.0))
 	player.play()
 
 

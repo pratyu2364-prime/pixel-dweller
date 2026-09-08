@@ -40,11 +40,15 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R14 | ChamberProver: fairness proof per floor | in_review | #55 | searches space+time; runs in CI |
 | R15 | Presentation: name, floor cards, pause, shake | in_review | #56 | project is now PENUMBRA |
 | R16 | Memories: optional risk, permanent boons | in_review | #57 | one per floor, always in glare |
-| R17 | AutoPlayer + light perf: walk the proof | in_review | — | 20x faster static light |
+| R17 | AutoPlayer + light perf: walk the proof | in_review | #58 | 20x faster static light |
+| R18 | Options: gentle, high contrast, still flames | in_review | — | plus renderer byte-buffer pass |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R18** — A game about being punished by light needs a way to
+  turn the punishment down. Gentle mode, high contrast and still flames, saved
+  beside progress — and the rooms, routes and endings stay identical.
 - **2026-09-08 · R17** — A bot now walks the proven routes with the real body,
   which immediately earned its keep: it exposed that the light field was being
   recomputed from scratch every frame. Still light is cached now — the Cistern
