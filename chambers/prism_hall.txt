@@ -8,11 +8,12 @@ ray: id=dusk cell=(37,3) dir=(-1,0) range=40
 whisper: at=(2,18) radius=3 they cut the walls to let the sun in. they cut too well
 whisper: at=(9,10) radius=3 the glass turns. everything else here does not
 whisper: at=(30,6) radius=4 send it somewhere it cannot follow you
+memory: at=(36,3) light bends. you never could. that was the difference
 
 ######################################
 #....................................#
 #..~~~..........#########............#
-#..~~~..........#.......\............#
+#..~~~..........#.......\...........*#
 #...............#....................#
 #########.#######....................#
 #.......#.......#........#########...#

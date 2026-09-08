@@ -38,11 +38,15 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R12 | The Lantern Room: Keeper + dual ending | in_review | #53 | the climb is completable end to end |
 | R13 | Procedural audio + README + ship | in_review | #54 | zero audio files; six generated voices |
 | R14 | ChamberProver: fairness proof per floor | in_review | #55 | searches space+time; runs in CI |
-| R15 | Presentation: name, floor cards, pause, shake | in_review | — | project is now PENUMBRA |
+| R15 | Presentation: name, floor cards, pause, shake | in_review | #56 | project is now PENUMBRA |
+| R16 | Memories: optional risk, permanent boons | in_review | — | one per floor, always in glare |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R16** — The only progression in the game: one memory per
+  floor, each standing in light with shade one step away, each carrying a line
+  about the woman she was cast from. They raise two ceilings and nothing else.
 - **2026-09-08 · R15** — The project is called what the game is called. Floor
   cards name each chamber on arrival and leave on their own, a pause menu can
   always start a floor over (a puzzle game that can be soft-locked is a broken

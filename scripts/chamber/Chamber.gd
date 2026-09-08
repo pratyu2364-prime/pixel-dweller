@@ -11,7 +11,8 @@ extends Node2D
 signal exit_reached
 signal umbra_scattered(cell: Vector2i)
 signal ending_reached(kind: String)
-signal restart_requested  ## "free" — the Lamp is out; "rejoin" — the stair
+signal restart_requested
+signal memory_found(id: String, text: String)  ## "free" — the Lamp is out; "rejoin" — the stair
 
 const CELL := ChamberData.CELL_SIZE
 const INK_RADIUS := 2.2
@@ -36,7 +37,9 @@ var card: FloorCard
 var pause_menu: PauseMenu
 var _camera: Camera2D
 var _shake: float = 0.0
+var progress: Progress
 var _whispers_said: Dictionary = {}
+var _memories_taken: Dictionary = {}
 
 var _exit_fired: bool = false
 
@@ -284,6 +287,7 @@ func _process(delta: float) -> void:
 	if keeper != null and umbra != null:
 		keeper.follow(umbra.current_cell())
 	_shake_camera(delta)
+	_check_memories()
 	_check_whispers()
 	if renderer != null:
 		renderer.advance(delta, ChamberRenderer.dread_for(umbra.state if umbra else null))
@@ -309,6 +313,39 @@ func _update_hud() -> void:
 		hud.set_hint("cling to lift the candle")
 	else:
 		hud.set_hint("hold cling to smother it")
+
+
+## Memories sit where she should not want to go. Taking one is permanent, and
+## the only thing in the game that makes her stronger.
+func _check_memories() -> void:
+	if umbra == null or progress == null:
+		return
+	var cell := umbra.current_cell()
+	for memory in data.memories:
+		if memory["cell"] != cell:
+			continue
+		var id := Progress.memory_id(data.id, cell)
+		if _memories_taken.has(id) or progress.has_memory(id):
+			continue
+		_memories_taken[id] = true
+		progress.remember(id)
+		apply_boons()
+		if hud != null:
+			hud.say(String(memory["text"]))
+		if sound != null:
+			sound.play(Sound.Voice.REFORM, -10.0)
+		memory_found.emit(id, String(memory["text"]))
+		return
+
+
+## Everything she has ever remembered, applied to this body.
+func apply_boons() -> void:
+	if progress == null or umbra == null:
+		return
+	var boons := progress.boons()
+	umbra.state.bonus_coherence = boons["coherence"]
+	umbra.state.bonus_ink = boons["ink"]
+	umbra.state.coherence = minf(umbra.state.coherence, umbra.state.max_coherence())
 
 
 ## Each whisper lands once, when she first comes close enough to think it.

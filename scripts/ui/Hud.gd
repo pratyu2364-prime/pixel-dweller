@@ -110,7 +110,7 @@ static func coherence_color(fraction: float) -> Color:
 
 func _draw_ink(canvas: Control) -> void:
 	var origin := BAR_MARGIN + Vector2(0, BAR_SIZE.y + 8)
-	for i in int(ShadowState.MAX_INK):
+	for i in int(state.max_ink()):
 		var at := origin + Vector2((PIP_SIZE.x + PIP_GAP) * i, 0)
 		var charged := state.ink >= float(i + 1)
 		var partial := clampf(state.ink - float(i), 0.0, 1.0)
