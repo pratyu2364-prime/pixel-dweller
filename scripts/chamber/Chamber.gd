@@ -30,6 +30,7 @@ var movers: Array[MovingLight] = []
 var touch: TouchPad
 var keeper: Keeper
 var chain: LampChain
+var sound: Sound
 var _whispers_said: Dictionary = {}
 
 var _exit_fired: bool = false
@@ -52,6 +53,7 @@ func load_chamber(path: String) -> void:
 	_spawn_renderer()
 	_spawn_umbra()
 	_spawn_wardens()
+	_spawn_sound()
 	_spawn_chain()
 	_spawn_keeper()
 	_spawn_hud()
@@ -125,6 +127,17 @@ func _attach_camera() -> void:
 
 ## The Great Lamp cannot be touched while its feeders burn, so the finale is
 ## the game's own vocabulary at full size rather than a new mechanic.
+func _spawn_sound() -> void:
+	sound = Sound.new()
+	sound.name = "Sound"
+	add_child(sound)
+	umbra.cast_requested.connect(func(_cell: Vector2i) -> void: sound.play(Sound.Voice.CAST))
+	umbra.scattered_at.connect(func(_cell: Vector2i) -> void: sound.play(Sound.Voice.SCATTER, -3.0))
+	umbra.reformed_at.connect(func(_cell: Vector2i) -> void: sound.play(Sound.Voice.REFORM, -8.0))
+	cling.snuffed.connect(func(_id: String) -> void: sound.play(Sound.Voice.SNUFF, -5.0))
+	cling.turned_mirror.connect(func(_cell: Vector2i) -> void: sound.play(Sound.Voice.TURN, -12.0))
+
+
 func _spawn_chain() -> void:
 	if data.chain.is_empty():
 		return
@@ -262,6 +275,8 @@ func _check_whispers() -> void:
 		if Vector2(whisper["cell"] - cell).length() <= float(whisper["radius"]):
 			_whispers_said[index] = true
 			hud.say(String(whisper["text"]))
+			if sound != null:
+				sound.play(Sound.Voice.WHISPER, -18.0)
 			return
 
 

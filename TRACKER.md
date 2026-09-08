@@ -35,12 +35,15 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R9 | Candle Rows (floor −2) + whispers | in_review | #50 | teaches Cling; diegetic tutorial |
 | R10 | The Prism Hall: mirrors + traced rays | in_review | #51 | turnable glass; floor +1 |
 | R11 | Title + save/progress + touch controls | in_review | #52 | phone-playable; descend where you left off |
-| R12 | The Lantern Room: Keeper + dual ending | in_review | — | the climb is completable end to end |
-| R13 | Title, audio, touch polish, ship | todo | — | deploy to Pages |
+| R12 | The Lantern Room: Keeper + dual ending | in_review | #53 | the climb is completable end to end |
+| R13 | Procedural audio + README + ship | in_review | — | zero audio files; six generated voices |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R13** — Sound, without a single audio file: six voices
+  generated at runtime from shaped oscillators and breath. README rewritten
+  around the rule. The build ships to Pages on merge.
 - **2026-09-08 · R12** — The climb has a top. The Great Lamp will not be
   touched while its three feeders burn; the Keeper walks toward her the whole
   time, slower than she is, carrying the last flame. Two endings, no score, and
