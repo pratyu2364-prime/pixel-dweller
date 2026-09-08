@@ -7,6 +7,7 @@ extends Control
 signal start_requested(chamber: String)
 
 const FLOOR_NAMES := {
+	"drowned_stair": "−4 · The Drowned Stair",
 	"cistern": "−3 · The Cistern",
 	"candle_rows": "−2 · Candle Rows",
 	"orrery": "−1 · The Orrery",

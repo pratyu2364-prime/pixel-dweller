@@ -9,7 +9,8 @@ func after_each() -> void:
 
 func test_a_fresh_save_starts_at_the_bottom() -> void:
 	var p := Progress.new()
-	assert_eq(p.reached, "cistern")
+	assert_eq(p.reached, Progress.FIRST_CHAMBER)
+	assert_eq(Progress.FIRST_CHAMBER, Game.DEFAULT_ORDER[0], "the save starts where the climb does")
 	assert_false(p.has_started())
 
 

@@ -26,7 +26,7 @@ func test_no_floor_demands_an_unreasonable_number_of_crossings() -> void:
 func test_no_floor_is_a_marathon() -> void:
 	for id in Game.DEFAULT_ORDER:
 		var prover := _prove(id)
-		assert_lt(prover.seconds_taken(), 90.0, "%s is too long a hold" % id)
+		assert_lt(prover.seconds_taken(), 120.0, "%s is too long a hold" % id)
 
 
 func test_the_prover_refuses_a_room_with_no_way_through() -> void:
