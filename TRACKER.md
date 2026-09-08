@@ -42,11 +42,16 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R16 | Memories: optional risk, permanent boons | in_review | #57 | one per floor, always in glare |
 | R17 | AutoPlayer + light perf: walk the proof | in_review | #58 | 20x faster static light |
 | R18 | Options: gentle, high contrast, still flames | in_review | #59 | plus renderer byte-buffer pass |
-| R19 | The Drowned Stair: tides | in_review | — | floor −4; the room itself floods |
+| R19 | The Drowned Stair: tides | in_review | #60 | floor −4; the room itself floods |
+| R20 | The Lamplighter + The Long Gallery | in_review | — | an enemy that makes new light |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R20** — A second kind of keeper: the Lamplighter, who does not
+  relight what you snuffed but sets *new* candles as they walk. The Long Gallery
+  (floor +1) is built around the pressure that creates — hesitate and the room
+  itself gets worse. Climb is now eight floors.
 - **2026-09-08 · R19** — The charter's unused idea, built: rooms whose ambient
   light rises on a clock. The Drowned Stair (floor −4) is now the bottom of the
   climb, and the prover extends its horizon to cover a whole tide.

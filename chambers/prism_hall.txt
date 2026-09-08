@@ -1,6 +1,6 @@
 id: prism_hall
 title: The Prism Hall
-subtitle: floor +1 · here the light is aimed, and so can be turned
+subtitle: floor +2 · here the light is aimed, and so can be turned
 ambient: 0.02
 next: 
 ray: id=dawn cell=(0,10) dir=(1,0) range=40

@@ -15,7 +15,7 @@ const FADE_SECONDS := 0.45
 ## The Sunken Observatory, cellar first. A chamber's own `next:` overrides this,
 ## so a floor can be rerouted without touching code.
 const DEFAULT_ORDER: Array[String] = [
-	"drowned_stair", "cistern", "candle_rows", "orrery", "warden_walk", "prism_hall", "lantern_room"
+	"drowned_stair", "cistern", "candle_rows", "orrery", "warden_walk", "long_gallery", "prism_hall", "lantern_room"
 ]
 
 @export var start_chamber: String = "cistern"

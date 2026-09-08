@@ -28,6 +28,7 @@ var cling: ClingController
 var hud: Hud
 var renderer: ChamberRenderer
 var wardens: Array[Warden] = []
+var lamplighters: Array[Lamplighter] = []
 var movers: Array[MovingLight] = []
 var tide: Tide
 var _tide_seconds: float = 0.0
@@ -197,6 +198,13 @@ func _spawn_wardens() -> void:
 		)
 		if not route.is_valid():
 			push_error("Warden %s has an unwalkable beat" % definition["id"])
+			continue
+		if definition.get("lamplighter", false):
+			var lamplighter := Lamplighter.new()
+			lamplighter.name = String(definition["id"])
+			add_child(lamplighter)
+			lamplighter.setup(String(definition["id"]), route, field, cling)
+			lamplighters.append(lamplighter)
 			continue
 		var warden := Warden.new()
 		warden.name = String(definition["id"])
