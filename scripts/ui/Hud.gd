@@ -16,9 +16,14 @@ var state: ShadowState = null
 var glare: float = 0.0
 var smother: float = 0.0
 var hint: String = ""
+var whisper: String = ""
+
+const WHISPER_SECONDS := 4.5
+var _whisper_timer: float = 0.0
 
 @onready var _canvas: Control = $Canvas
 @onready var _hint_label: Label = $Canvas/Hint
+@onready var _whisper_label: Label = $Canvas/Whisper
 
 
 func _ready() -> void:
@@ -45,9 +50,33 @@ func set_hint(text: String) -> void:
 		_hint_label.visible = not text.is_empty()
 
 
-func _process(_delta: float) -> void:
+## Whispers are Umbra's own thoughts: they arrive, they linger, they fade. The
+## player is never asked to dismiss one.
+func say(text: String) -> void:
+	whisper = text
+	_whisper_timer = WHISPER_SECONDS
+	if _whisper_label != null:
+		_whisper_label.text = text
+		_whisper_label.modulate.a = 0.0
+
+
+func _process(delta: float) -> void:
 	if _canvas != null:
 		_canvas.queue_redraw()
+	_fade_whisper(delta)
+
+
+func _fade_whisper(delta: float) -> void:
+	if _whisper_label == null:
+		return
+	if _whisper_timer <= 0.0:
+		_whisper_label.modulate.a = maxf(0.0, _whisper_label.modulate.a - delta * 1.5)
+		if _whisper_label.modulate.a <= 0.0:
+			whisper = ""
+		return
+	_whisper_timer -= delta
+	var appearing: float = minf(1.0, (WHISPER_SECONDS - _whisper_timer) * 2.0)
+	_whisper_label.modulate.a = minf(appearing, maxf(0.0, _whisper_timer))
 
 
 ## Called by the Canvas child's draw signal (wired in the scene).

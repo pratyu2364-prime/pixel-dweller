@@ -32,14 +32,18 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R6 | Wardens + chamber progression | done | #47 | Warden's Walk; Game sequence |
 | R7 | The Orrery: orbiting lamps + sweeping beam | in_review | #48 | beams in LightField; floor −1 |
 | R8 | Candle Rows (floor −2) + tutorialisation | todo | — | teaches Cling before the Walk |
-| R9 | The Prism Hall: mirrors + refraction | todo | — | hardest puzzle floor |
-| R10 | Progression, save, chamber select, memories | todo | — | permanent ink/coherence upgrades |
-| R11 | The Lantern Keeper + dual ending | todo | — | boss + finale |
-| R12 | Title, tutorialisation, audio, touch polish, ship | todo | — | deploy to Pages |
-| R8 | Legacy purge: delete the retired build | in_review | — | 22 scripts, 9 scenes, 23 tests gone |
+| R9 | Candle Rows (floor −2) + whispers | in_review | — | teaches Cling; diegetic tutorial |
+| R10 | The Prism Hall: mirrors + refraction | todo | — | hardest puzzle floor |
+| R11 | Progression, save, chamber select, memories | todo | — | permanent ink/coherence upgrades |
+| R12 | The Lantern Keeper + dual ending | todo | — | boss + finale |
+| R13 | Title, audio, touch polish, ship | todo | — | deploy to Pages |
+| R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R9** — Candle Rows (floor −2) and whispers: teaching happens
+  in the room, in her own voice, once, and fades on its own. No tooltips, no
+  tutorial menu, no button that says "got it".
 - **2026-09-08 · R8** — The old game is gone: Dweller, Stats, needs decay, life
   stages, NPCs, districts, shops, sword combat, slimes, the city map and every
   test that guarded them. What is left is PENUMBRA and nothing else.

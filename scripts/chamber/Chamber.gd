@@ -26,6 +26,7 @@ var hud: Hud
 var renderer: ChamberRenderer
 var wardens: Array[Warden] = []
 var movers: Array[MovingLight] = []
+var _whispers_said: Dictionary = {}
 
 var _exit_fired: bool = false
 
@@ -161,6 +162,7 @@ func _process(delta: float) -> void:
 	if umbra != null:
 		cling.tick(delta, umbra.current_cell(), umbra.is_clinging())
 		_update_hud()
+	_check_whispers()
 	if renderer != null:
 		renderer.advance(delta, ChamberRenderer.dread_for(umbra.state if umbra else null))
 	_check_exit()
@@ -183,6 +185,21 @@ func _update_hud() -> void:
 		hud.set_hint("cling to lift the candle")
 	else:
 		hud.set_hint("hold cling to smother it")
+
+
+## Each whisper lands once, when she first comes close enough to think it.
+func _check_whispers() -> void:
+	if hud == null or umbra == null:
+		return
+	var cell := umbra.current_cell()
+	for index in data.whispers.size():
+		if _whispers_said.has(index):
+			continue
+		var whisper: Dictionary = data.whispers[index]
+		if Vector2(whisper["cell"] - cell).length() <= float(whisper["radius"]):
+			_whispers_said[index] = true
+			hud.say(String(whisper["text"]))
+			return
 
 
 func _check_exit() -> void:

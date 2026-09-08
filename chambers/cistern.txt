@@ -2,6 +2,11 @@ id: cistern
 title: The Cistern
 subtitle: floor −3 · where a shadow learns it can drown in light
 ambient: 0.0
+next: candle_rows
+whisper: at=(2,2) radius=3 you came loose. the dark still fits you
+whisper: at=(9,2) radius=4 the lamp ahead will eat you. go around it
+whisper: at=(20,10) radius=5 throw the dark you carry — it will hold, for a while
+whisper: at=(36,20) radius=4 down here the light is only sleeping
 
 ########################################
 #~~....................................#
