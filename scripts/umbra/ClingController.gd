@@ -17,6 +17,7 @@ signal grabbed(light_id: String)
 signal released(light_id: String)
 signal snuffed(light_id: String)
 signal relit(light_id: String)
+signal turned_mirror(cell: Vector2i)
 
 const CLING_RANGE := 1.9  ## cells; roughly "you can touch it"
 const CARRY_INTENSITY := 0.45  ## a carried candle is half-smothered in her grip
@@ -73,12 +74,17 @@ func target_near(cell: Vector2i) -> String:
 	return best
 
 
-## One press of Cling: release what you hold, else grab what you can lift, else
-## begin smothering what you cannot.
+## One press of Cling: release what you hold, else turn a mirror you are stood
+## beside, else grab what you can lift, else begin smothering what you cannot.
 func press(cell: Vector2i) -> String:
 	if is_holding():
 		release(cell)
 		return "release"
+	var mirror := nearest_mirror(cell)
+	if mirror != Vector2i(-1, -1):
+		field.turn_mirror(mirror)
+		turned_mirror.emit(mirror)
+		return "turn"
 	var target := target_near(cell)
 	if target.is_empty():
 		return ""
@@ -88,6 +94,22 @@ func press(cell: Vector2i) -> String:
 	smother_id = target
 	smother_progress = 0.0
 	return "smother"
+
+
+## Mirrors are reached the same way lights are: by standing next to them.
+func nearest_mirror(cell: Vector2i) -> Vector2i:
+	var best := Vector2i(-1, -1)
+	var best_distance := CLING_RANGE
+	for dy in range(-2, 3):
+		for dx in range(-2, 3):
+			var candidate := cell + Vector2i(dx, dy)
+			if not field.has_mirror(candidate):
+				continue
+			var distance := Vector2(dx, dy).length()
+			if distance <= best_distance:
+				best_distance = distance
+				best = candidate
+	return best
 
 
 func release_press() -> void:

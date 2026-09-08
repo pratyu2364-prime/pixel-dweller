@@ -35,6 +35,8 @@ var nooks: Array[Vector2i] = []
 var lights: Array[Dictionary] = []  ## {id, cell, radius, intensity, kind}
 var wardens: Array[Dictionary] = []  ## {id, waypoints, mode, speed, lantern}
 var movers: Array[Dictionary] = []  ## orbiting lamps and sweeping beams
+var mirrors: Array[Dictionary] = []  ## {cell, orientation}
+var rays: Array[Dictionary] = []  ## {id, cell, direction, intensity, range}
 var whispers: Array[Dictionary] = []  ## {cell, radius, text}
 var next_id: String = ""  ## the chamber this one leads to; empty ends the run
 var parse_errors: Array[String] = []
@@ -93,6 +95,8 @@ func _read_front_matter(line: String) -> void:
 			next_id = value
 		"warden":
 			_read_warden(value)
+		"ray":
+			_read_ray(value)
 		"whisper":
 			_read_whisper(value)
 		"orbit":
@@ -143,6 +147,39 @@ func _read_warden(value: String) -> void:
 ## `whisper: at=(3,5) radius=3 the light does not like you`
 ## Teaching happens in the room, in her own voice, once — never in a tooltip
 ## and never in a menu the player has to be told to open.
+## `ray: id=dawn cell=(1,9) dir=(1,0) range=34`
+func _read_ray(value: String) -> void:
+	var ray := {
+		"id": "ray_%d" % rays.size(),
+		"cell": Vector2i.ZERO,
+		"direction": Vector2i.RIGHT,
+		"intensity": 1.0,
+		"range": 30,
+	}
+	for token in value.split(" ", false):
+		var pair := String(token).split("=", true, 1)
+		if pair.size() != 2:
+			parse_errors.append("bad ray token: %s" % token)
+			continue
+		var point := MovingLight._parse_point(pair[1])
+		match pair[0]:
+			"id":
+				ray["id"] = pair[1]
+			"cell":
+				ray["cell"] = Vector2i(roundi(point.x), roundi(point.y))
+			"dir":
+				ray["direction"] = Vector2i(roundi(point.x), roundi(point.y))
+			"intensity":
+				ray["intensity"] = pair[1].to_float()
+			"range":
+				ray["range"] = int(pair[1].to_int())
+			_:
+				parse_errors.append("unknown ray key: %s" % pair[0])
+	if ray["direction"] == Vector2i.ZERO:
+		parse_errors.append("ray %s points nowhere" % ray["id"])
+	rays.append(ray)
+
+
 func _read_whisper(value: String) -> void:
 	var whisper := {"cell": Vector2i.ZERO, "radius": 3.0, "text": ""}
 	var words: Array[String] = []
@@ -191,6 +228,8 @@ func _read_map(map_lines: Array[String]) -> void:
 					pass
 				"~":
 					nooks.append(cell)
+				"/", "\\":
+					mirrors.append({"cell": cell, "orientation": glyph})
 				"s":
 					sunbeams.append(cell)
 				"@":
@@ -255,6 +294,14 @@ func build_field() -> LightField:
 		field.set_nook(cell, true)
 	for light in lights:
 		field.emit(light["id"], light["cell"], light["radius"], light["intensity"])
+	for mirror in mirrors:
+		field.set_mirror(mirror["cell"], mirror["orientation"])
+	for ray in rays:
+		field.add_ray(
+			LightField.LightRay.new(
+				ray["id"], ray["cell"], ray["direction"], ray["intensity"], ray["range"]
+			)
+		)
 	for definition in movers:
 		MovingLight.from_definition(definition).install(field, definition["light"])
 	return field

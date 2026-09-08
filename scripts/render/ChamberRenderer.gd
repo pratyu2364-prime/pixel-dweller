@@ -57,6 +57,24 @@ func refresh() -> void:
 	_texture.update(_image)
 
 
+## Mirrors are drawn as glass, above the light pass: the one solid thing in a
+## chamber that answers to the player.
+func _draw() -> void:
+	if data == null:
+		return
+	var cell_size := float(ChamberData.CELL_SIZE)
+	for mirror in data.mirrors:
+		var at: Vector2i = mirror["cell"]
+		var orientation: String = field.mirror_at(at)
+		var origin := (Vector2(at) - Vector2(data.bounds_rect().position) / cell_size)
+		var base := origin * cell_size + Vector2.ONE * cell_size * 0.5
+		var span := Vector2(cell_size * 0.42, cell_size * 0.42)
+		var from := base + (Vector2(-span.x, span.y) if orientation == "/" else -span)
+		var to := base + (Vector2(span.x, -span.y) if orientation == "/" else span)
+		draw_line(from, to, Color(0.75, 0.90, 1.0, 0.85), 2.0)
+		draw_line(from, to, Color(1.0, 1.0, 1.0, 0.25), 4.0)
+
+
 func advance(delta: float, dread: float) -> void:
 	_time += delta
 	if _material == null:
@@ -64,6 +82,7 @@ func advance(delta: float, dread: float) -> void:
 	_material.set_shader_parameter("time_seconds", _time)
 	_material.set_shader_parameter("dread", clampf(dread, 0.0, 1.0))
 	refresh()
+	queue_redraw()
 
 
 ## What the shader is being told about her condition: 0 while she is whole,
