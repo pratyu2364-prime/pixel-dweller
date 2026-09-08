@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpenumbratitle01"]
+
+[ext_resource type="Script" path="res://scripts/ui/Title.gd" id="1_title"]
+
+[node name="Title" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_title")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.043137, 0.043137, 0.078431, 1)
+
+[node name="Menu" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -120.0
+offset_right = 170.0
+offset_bottom = 140.0
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="Name" type="Label" parent="Menu"]
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.87, 1, 0.92)
+theme_override_font_sizes/font_size = 48
+text = "PENUMBRA"
+
+[node name="Tagline" type="Label" parent="Menu"]
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.6, 0.62, 0.85, 0.75)
+text = "you are a shadow. you only exist where there is no light."
+
+[node name="Where" type="Label" parent="Menu"]
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.55, 0.58, 0.8, 0.7)
+text = ""
+
+[node name="Continue" type="Button" parent="Menu"]
+text = "descend"
+
+[node name="Begin" type="Button" parent="Menu"]
+text = "begin"

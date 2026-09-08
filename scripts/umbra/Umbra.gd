@@ -22,6 +22,10 @@ var state: ShadowState = ShadowState.new()
 var field: LightField = null
 var cell_size: int = CELL_SIZE
 var input_enabled: bool = true
+## Set by the touch pad. Added to the keyboard vector so a phone and a keyboard
+## can drive the same body without either knowing about the other.
+var touch_direction: Vector2 = Vector2.ZERO
+var touch_cling: bool = false
 
 var _reform_timer: float = 0.0
 
@@ -72,11 +76,13 @@ func _physics_process(delta: float) -> void:
 func _read_input() -> Vector2:
 	if not input_enabled:
 		return Vector2.ZERO
-	return Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var keys := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var combined := keys + touch_direction
+	return combined if combined.length() <= 1.0 else combined.normalized()
 
 
 func is_clinging() -> bool:
-	return input_enabled and Input.is_action_pressed("cling")
+	return input_enabled and (touch_cling or Input.is_action_pressed("cling"))
 
 
 func _apply_motion(delta: float, direction: Vector2) -> void:

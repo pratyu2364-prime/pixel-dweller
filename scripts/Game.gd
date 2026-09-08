@@ -19,6 +19,11 @@ const DEFAULT_ORDER: Array[String] = ["cistern", "candle_rows", "orrery", "warde
 
 var chamber: Chamber
 var current_id: String = ""
+var progress: Progress = Progress.new()
+
+## Set by the title screen before the scene swaps, so Game does not have to
+## know a title screen exists.
+static var pending_chamber: String = ""
 
 var _fade: ColorRect
 var _swapping: bool = false
@@ -26,7 +31,10 @@ var _swapping: bool = false
 
 func _ready() -> void:
 	_build_fade()
-	enter(start_chamber)
+	progress = Progress.load_from()
+	var first := pending_chamber if not pending_chamber.is_empty() else start_chamber
+	pending_chamber = ""
+	enter(first)
 
 
 func _build_fade() -> void:
@@ -65,13 +73,27 @@ func enter(id: String) -> void:
 	chamber.chamber_path = path_for(id)
 	add_child(chamber)
 	chamber.exit_reached.connect(_on_exit_reached, CONNECT_ONE_SHOT)
+	chamber.umbra_scattered.connect(_on_scattered)
+	progress.enter(id, DEFAULT_ORDER)
+	progress.save()
 	chamber_entered.emit(id)
+
+
+func _on_scattered(_cell: Vector2i) -> void:
+	progress.record_scatter()
+	progress.save()
+
+
+func _process(delta: float) -> void:
+	progress.add_time(delta)
 
 
 func _on_exit_reached() -> void:
 	if _swapping:
 		return
 	_swapping = true
+	progress.complete(current_id)
+	progress.save()
 	var next := next_after(current_id, chamber.data.next_id)
 	if next.is_empty():
 		climb_finished.emit()

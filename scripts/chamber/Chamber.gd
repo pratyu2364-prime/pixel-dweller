@@ -26,6 +26,7 @@ var hud: Hud
 var renderer: ChamberRenderer
 var wardens: Array[Warden] = []
 var movers: Array[MovingLight] = []
+var touch: TouchPad
 var _whispers_said: Dictionary = {}
 
 var _exit_fired: bool = false
@@ -142,6 +143,23 @@ func _spawn_hud() -> void:
 	hud = HUD_SCENE.instantiate()
 	add_child(hud)
 	hud.bind(umbra.state)
+	_wire_touch()
+
+
+func _wire_touch() -> void:
+	touch = TouchPad.new()
+	touch.name = "TouchPad"
+	hud.get_node("Canvas").add_child(touch)
+	touch.cast_pressed.connect(func() -> void: umbra.try_cast())
+	touch.cling_changed.connect(_on_touch_cling)
+
+
+func _on_touch_cling(down: bool) -> void:
+	umbra.touch_cling = down
+	if down:
+		_on_cling_pressed(umbra.current_cell())
+	else:
+		cling.release_press()
 
 
 func _on_cling_pressed(cell: Vector2i) -> void:
@@ -162,6 +180,8 @@ func _process(delta: float) -> void:
 	if umbra != null:
 		cling.tick(delta, umbra.current_cell(), umbra.is_clinging())
 		_update_hud()
+	if touch != null:
+		umbra.touch_direction = touch.direction
 	_check_whispers()
 	if renderer != null:
 		renderer.advance(delta, ChamberRenderer.dread_for(umbra.state if umbra else null))
