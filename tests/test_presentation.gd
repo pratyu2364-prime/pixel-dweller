@@ -1,6 +1,10 @@
 extends GutTest
 
 
+func after_each() -> void:
+	get_tree().paused = false
+
+
 func _room(path: String = "res://chambers/cistern.txt") -> Chamber:
 	var chamber := Chamber.new()
 	chamber.chamber_path = path

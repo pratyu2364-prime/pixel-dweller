@@ -39,11 +39,16 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R13 | Procedural audio + README + ship | in_review | #54 | zero audio files; six generated voices |
 | R14 | ChamberProver: fairness proof per floor | in_review | #55 | searches space+time; runs in CI |
 | R15 | Presentation: name, floor cards, pause, shake | in_review | #56 | project is now PENUMBRA |
-| R16 | Memories: optional risk, permanent boons | in_review | — | one per floor, always in glare |
+| R16 | Memories: optional risk, permanent boons | in_review | #57 | one per floor, always in glare |
+| R17 | AutoPlayer + light perf: walk the proof | in_review | — | 20x faster static light |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R17** — A bot now walks the proven routes with the real body,
+  which immediately earned its keep: it exposed that the light field was being
+  recomputed from scratch every frame. Still light is cached now — the Cistern
+  went from 2.07 ms/frame to 0.10.
 - **2026-09-08 · R16** — The only progression in the game: one memory per
   floor, each standing in light with shade one step away, each carrying a line
   about the woman she was cast from. They raise two ceilings and nothing else.
