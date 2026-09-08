@@ -23,6 +23,7 @@ var field: LightField
 var umbra: Umbra
 var cling: ClingController
 var hud: Hud
+var renderer: ChamberRenderer
 
 var _exit_fired: bool = false
 
@@ -39,9 +40,18 @@ func load_chamber(path: String) -> void:
 	field = data.build_field()
 	cling = ClingController.new(field, data.lights)
 	_build_walls()
+	_spawn_renderer()
 	_spawn_umbra()
 	_spawn_hud()
-	queue_redraw()
+
+
+## Behind everything, so Umbra reads as a hole punched in the light.
+func _spawn_renderer() -> void:
+	renderer = ChamberRenderer.new()
+	renderer.name = "Renderer"
+	renderer.z_index = -10
+	add_child(renderer)
+	renderer.setup(data, field)
 
 
 func _build_walls() -> void:
@@ -116,7 +126,6 @@ func _on_cling_pressed(cell: Vector2i) -> void:
 
 func _on_cast_requested(cell: Vector2i) -> void:
 	field.cast_ink(cell, INK_RADIUS, 1.0, INK_LIFE)
-	queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -126,8 +135,9 @@ func _process(delta: float) -> void:
 	if umbra != null:
 		cling.tick(delta, umbra.current_cell(), umbra.is_clinging())
 		_update_hud()
+	if renderer != null:
+		renderer.advance(delta, ChamberRenderer.dread_for(umbra.state if umbra else null))
 	_check_exit()
-	queue_redraw()
 
 
 ## The only text the game ever shows during play: what this light will do if you
@@ -155,35 +165,3 @@ func _check_exit() -> void:
 	if umbra.current_cell() == data.exit:
 		_exit_fired = true
 		exit_reached.emit()
-
-
-# --- placeholder rendering ----------------------------------------------------
-
-
-func _draw() -> void:
-	if data == null or field == null:
-		return
-	var levels := field.levels()
-	for y in data.height:
-		for x in data.width:
-			var cell := Vector2i(x, y)
-			var rect := Rect2(Vector2(cell * CELL), Vector2(CELL, CELL))
-			if data.is_wall(cell):
-				draw_rect(rect, Color(0.10, 0.09, 0.14))
-				continue
-			var level: float = levels[y * data.width + x]
-			draw_rect(rect, _floor_color(level))
-	if data.exit != Vector2i(-1, -1):
-		draw_rect(Rect2(Vector2(data.exit * CELL), Vector2(CELL, CELL)), Color(0.25, 0.9, 0.75, 0.5))
-
-
-## Cold void → warm glare, with a visible step exactly at the shade threshold so
-## the player can read safety at a glance instead of guessing at a gradient.
-func _floor_color(level: float) -> Color:
-	var void_color := Color(0.05, 0.05, 0.09)
-	var shade_color := Color(0.11, 0.12, 0.20)
-	var warm := Color(0.98, 0.85, 0.55)
-	if level <= LightField.SHADE_MAX:
-		return void_color.lerp(shade_color, level / LightField.SHADE_MAX)
-	var t := (level - LightField.SHADE_MAX) / (1.0 - LightField.SHADE_MAX)
-	return Color(0.30, 0.26, 0.28).lerp(warm, t)

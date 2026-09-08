@@ -28,6 +28,9 @@ var _reform_timer: float = 0.0
 const REFORM_DELAY := 0.8  ## the beat of being scattered, before you snap back
 
 
+@onready var blot: UmbraBlot = $Blot
+
+
 func _ready() -> void:
 	state.scattered.connect(_on_scattered)
 
@@ -63,6 +66,7 @@ func _physics_process(delta: float) -> void:
 
 	state.tick(delta, glare(), in_deep_shade())
 	_apply_motion(delta, _read_input())
+	_sync_blot()
 
 
 func _read_input() -> Vector2:
@@ -84,8 +88,14 @@ func _apply_motion(delta: float, direction: Vector2) -> void:
 	move_and_slide()
 
 
+func _sync_blot() -> void:
+	if blot != null:
+		blot.set_condition(glare(), state.fraction(), state.is_scattered)
+
+
 func _tick_scattered(delta: float) -> void:
 	velocity = Vector2.ZERO
+	_sync_blot()
 	_reform_timer -= delta
 	if _reform_timer <= 0.0:
 		reform()
