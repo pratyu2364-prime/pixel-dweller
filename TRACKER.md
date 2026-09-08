@@ -47,10 +47,16 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R21 | Prove the memories are collectable | in_review | #62 | prover routes through a via-cell |
 | R22 | What you remember: the collected lines | in_review | #63 | blanks show what is still down there |
 | R23 | Split the proofs into their own CI job | in_review | — | fast suite 1.9s, proofs 78s |
+| R24 | How to play: a briefing on the title and in the pause menu | in_review | — | 239 fast tests |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R24** — The game finally says what it is. A three-card
+  briefing (the rule, the verbs, the meters) on the title screen and inside the
+  pause menu, its text held as static data so a test can assert every bound verb
+  is explained. README gained a "How to play" section for people who read the
+  link before they open it.
 - **2026-09-08 · R23** — The proofs had grown to 78s and were sharing a job
   with lint and export. Split: `tests/` stays a two-second suite, `tests/proofs/`
   runs on its own with room to breathe.

@@ -1,10 +1,12 @@
 class_name PauseMenu
 extends CanvasLayer
 
-## Escape, or the corner button on a phone. Three things only: go back to the
-## room, start this floor over, or leave. Starting a floor over exists because
-## a shadow can strand herself in a lit corner, and a puzzle game that can be
-## soft-locked without a way out is a broken one.
+## Escape, or the corner button on a phone: go back to the room, re-read the
+## briefing, start this floor over, or leave. Starting a floor over exists
+## because a shadow can strand herself in a lit corner, and a puzzle game that
+## can be soft-locked without a way out is a broken one. The briefing is here
+## as well as on the title because the verb you have forgotten is the one you
+## need mid-floor.
 
 signal resumed
 signal restart_requested
@@ -40,8 +42,20 @@ func _init() -> void:
 	_root.add_child(_panel)
 
 	_add_button("back to the dark", func() -> void: close())
+	_add_button("how to play", func() -> void: _open_briefing())
 	_add_button("start this floor over", func() -> void: restart_requested.emit())
 	_add_button("leave", func() -> void: quit_requested.emit())
+
+
+## Built on demand: most sessions never open it, and it is the only part of the
+## pause menu that costs a scene load.
+func _open_briefing() -> void:
+	var page: HowToPlayScreen = _root.get_node_or_null("HowToPlay")
+	if page == null:
+		page = load("res://scenes/HowToPlay.tscn").instantiate()
+		page.name = "HowToPlay"
+		_root.add_child(page)
+	page.present()
 
 
 func _add_button(text: String, action: Callable) -> void:
