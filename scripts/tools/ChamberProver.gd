@@ -23,6 +23,9 @@ var reachable: bool = false
 var slices_taken: int = -1
 var ink_spent: int = 0
 var visited_states: int = 0
+## The route itself, cell by cell, one entry per half-second slice. This is what
+## lets a bot walk the proof with the real body and real collision.
+var route: Array[Vector2i] = []
 
 var _data: ChamberData
 var _snapshots: Array[LightField] = []
@@ -83,6 +86,7 @@ func _search(budget: int) -> void:
 	var start := _data.spawn
 	var queue: Array = [[start, 0, MAX_INK, 0]]
 	var seen := {_key(start, 0, MAX_INK, 0): true}
+	var came_from := {}
 	var head := 0
 	while head < queue.size():
 		var state: Array = queue[head]
@@ -96,6 +100,7 @@ func _search(budget: int) -> void:
 			slices_taken = slice
 			ink_spent = spent
 			visited_states = seen.size()
+			route = _rebuild(came_from, head - 1, queue)
 			return
 		if slice >= _snapshots.size() * 2:
 			continue
@@ -118,8 +123,22 @@ func _search(budget: int) -> void:
 			if seen.has(key):
 				continue
 			seen[key] = true
+			came_from[queue.size()] = head - 1
 			queue.append([next, next_slice, next_ink, next_spent])
 	visited_states = seen.size()
+
+
+## Walks the search backwards from the state that reached the exit.
+func _rebuild(came_from: Dictionary, index: int, queue: Array) -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	var at := index
+	while at >= 0:
+		cells.append(queue[at][0])
+		if not came_from.has(at):
+			break
+		at = came_from[at]
+	cells.reverse()
+	return cells
 
 
 func seconds_taken() -> float:

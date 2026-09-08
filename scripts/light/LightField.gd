@@ -25,6 +25,10 @@ var _rays: Array[LightRay] = []
 var _emitters: Array[LightEmitter] = []
 var _inks: Array[InkPuff] = []
 var _dirty: bool = true
+## Most light in a chamber never moves, so the still part is composed once and
+## reused; only movers, warden lanterns and ink are paid for every frame.
+var _static_light: PackedFloat32Array
+var _static_dirty: bool = true
 
 
 ## A light source. Radius is in cells; intensity is the level at its own cell.
@@ -40,6 +44,9 @@ class LightEmitter:
 	## (the default) means an ordinary lamp shining every way at once.
 	var direction: Vector2 = Vector2.RIGHT
 	var cone_half_angle: float = TAU
+	## Set the first time something moves or re-aims this light. A light that
+	## has moved once will move again, so it stays out of the static layer.
+	var dynamic: bool = false
 
 	func is_beam() -> bool:
 		return cone_half_angle < PI
@@ -148,6 +155,7 @@ func set_opaque(cell: Vector2i, value: bool) -> void:
 	if not in_bounds(cell):
 		return
 	_opaque[_index(cell)] = 1 if value else 0
+	_static_dirty = true
 	_dirty = true
 
 
@@ -163,6 +171,7 @@ func set_nook(cell: Vector2i, value: bool) -> void:
 	if not in_bounds(cell):
 		return
 	_nooks[_index(cell)] = 1 if value else 0
+	_static_dirty = true
 	_dirty = true
 
 
@@ -175,17 +184,20 @@ func set_ambient_at(cell: Vector2i, value: float) -> void:
 	if not in_bounds(cell):
 		return
 	_ambient_cells[_index(cell)] = clampf(value, 0.0, 1.0)
+	_static_dirty = true
 	_dirty = true
 
 
 func set_ambient(value: float) -> void:
 	ambient = clampf(value, 0.0, 1.0)
 	_ambient_cells.fill(ambient)
+	_static_dirty = true
 	_dirty = true
 
 
 func add_emitter(emitter: LightEmitter) -> LightEmitter:
 	_emitters.append(emitter)
+	_static_dirty = true
 	_dirty = true
 	return emitter
 
@@ -210,6 +222,7 @@ func emitters() -> Array[LightEmitter]:
 func remove_emitter(id: String) -> void:
 	for i in range(_emitters.size() - 1, -1, -1):
 		if _emitters[i].id == id:
+			_static_dirty = _static_dirty or not _emitters[i].dynamic
 			_emitters.remove_at(i)
 			_dirty = true
 
@@ -219,6 +232,8 @@ func move_emitter(id: String, cell: Vector2i) -> void:
 	if e == null or e.cell == cell:
 		return
 	e.cell = cell
+	_static_dirty = _static_dirty or not e.dynamic
+	e.dynamic = true
 	_dirty = true
 
 
@@ -227,6 +242,7 @@ func set_emitter_enabled(id: String, enabled: bool) -> void:
 	if e == null or e.enabled == enabled:
 		return
 	e.enabled = enabled
+	_static_dirty = _static_dirty or not e.dynamic
 	_dirty = true
 
 
@@ -239,6 +255,7 @@ func set_emitter_intensity(id: String, intensity: float) -> void:
 	if is_equal_approx(e.intensity, clamped):
 		return
 	e.intensity = clamped
+	_static_dirty = _static_dirty or not e.dynamic
 	_dirty = true
 
 
@@ -250,6 +267,7 @@ func set_emitter_intensity(id: String, intensity: float) -> void:
 func set_mirror(cell: Vector2i, orientation: String) -> void:
 	if not in_bounds(cell):
 		return
+	_static_dirty = true
 	if orientation.is_empty():
 		_mirrors.erase(cell)
 	else:
@@ -270,6 +288,7 @@ func turn_mirror(cell: Vector2i) -> bool:
 	if not _mirrors.has(cell):
 		return false
 	_mirrors[cell] = "\\" if _mirrors[cell] == "/" else "/"
+	_static_dirty = true
 	_dirty = true
 	return true
 
@@ -283,6 +302,7 @@ static func reflect(direction: Vector2i, orientation: String) -> Vector2i:
 
 func add_ray(ray: LightRay) -> LightRay:
 	_rays.append(ray)
+	_static_dirty = true
 	_dirty = true
 	return ray
 
@@ -303,6 +323,7 @@ func set_ray_enabled(id: String, enabled: bool) -> void:
 	if ray == null or ray.enabled == enabled:
 		return
 	ray.enabled = enabled
+	_static_dirty = true
 	_dirty = true
 
 
@@ -371,14 +392,29 @@ func mark_dirty() -> void:
 	_dirty = true
 
 
-func recompute() -> void:
+## Everything that does not move: ambient, still lamps, traced rays, nooks.
+func _rebuild_static() -> void:
 	_light = _ambient_cells.duplicate()
 	for e in _emitters:
-		if e.enabled and e.intensity > 0.0:
+		if not e.dynamic and e.enabled and e.intensity > 0.0:
 			_add_emitter_light(e)
 	for ray in _rays:
 		if ray.enabled and ray.intensity > 0.0:
 			_add_ray_light(ray)
+	for i in _nooks.size():
+		if _nooks[i] == 1:
+			_light[i] = 0.0
+	_static_light = _light.duplicate()
+	_static_dirty = false
+
+
+func recompute() -> void:
+	if _static_dirty or _static_light.size() != _light.size():
+		_rebuild_static()
+	_light = _static_light.duplicate()
+	for e in _emitters:
+		if e.dynamic and e.enabled and e.intensity > 0.0:
+			_add_emitter_light(e)
 	for i in _nooks.size():
 		if _nooks[i] == 1:
 			_light[i] = 0.0
@@ -441,6 +477,8 @@ func aim_emitter(id: String, direction: Vector2, half_angle: float = -1.0) -> vo
 		e.direction = direction.normalized()
 	if half_angle >= 0.0:
 		e.cone_half_angle = half_angle
+	_static_dirty = _static_dirty or not e.dynamic
+	e.dynamic = true
 	_dirty = true
 
 
