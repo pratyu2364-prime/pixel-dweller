@@ -20,6 +20,8 @@ var _light: PackedFloat32Array
 var _ambient_cells: PackedFloat32Array
 var _opaque: PackedByteArray
 var _nooks: PackedByteArray
+var _mirrors: Dictionary = {}  ## cell -> "/" or "\\"
+var _rays: Array[LightRay] = []
 var _emitters: Array[LightEmitter] = []
 var _inks: Array[InkPuff] = []
 var _dirty: bool = true
@@ -54,6 +56,33 @@ class LightEmitter:
 		radius = maxf(p_radius, 0.001)
 		intensity = p_intensity
 		enabled = p_enabled
+
+
+## A ray of light: a beam traced cell by cell that reflects off mirrors and
+## stops at walls. Unlike a lamp, a ray is a *line* — which is what makes a
+## mirror worth turning.
+class LightRay:
+	extends RefCounted
+
+	var id: String
+	var cell: Vector2i
+	var direction: Vector2i
+	var intensity: float
+	var range_cells: int
+	var enabled: bool = true
+
+	func _init(
+		p_id: String,
+		p_cell: Vector2i,
+		p_direction: Vector2i = Vector2i.RIGHT,
+		p_intensity: float = 1.0,
+		p_range: int = 30
+	) -> void:
+		id = p_id
+		cell = p_cell
+		direction = p_direction
+		intensity = p_intensity
+		range_cells = p_range
 
 
 ## A cast puff of darkness. Subtracts light, ignores walls, fades with age.
@@ -213,6 +242,93 @@ func set_emitter_intensity(id: String, intensity: float) -> void:
 	_dirty = true
 
 
+# --- mirrors and rays ---------------------------------------------------------
+
+
+## Mirrors are "/" or "\\". They reflect rays and nothing else: a lamp's glow
+## passes them by, so a mirror in a dark room is a lever, not a light.
+func set_mirror(cell: Vector2i, orientation: String) -> void:
+	if not in_bounds(cell):
+		return
+	if orientation.is_empty():
+		_mirrors.erase(cell)
+	else:
+		_mirrors[cell] = orientation
+	_dirty = true
+
+
+func mirror_at(cell: Vector2i) -> String:
+	return String(_mirrors.get(cell, ""))
+
+
+func has_mirror(cell: Vector2i) -> bool:
+	return _mirrors.has(cell)
+
+
+## Turning a mirror is the Prism Hall's whole verb: one press, ninety degrees.
+func turn_mirror(cell: Vector2i) -> bool:
+	if not _mirrors.has(cell):
+		return false
+	_mirrors[cell] = "\\" if _mirrors[cell] == "/" else "/"
+	_dirty = true
+	return true
+
+
+static func reflect(direction: Vector2i, orientation: String) -> Vector2i:
+	## "/" maps right->up and down->left; "\\" maps right->down and up->left.
+	if orientation == "/":
+		return Vector2i(-direction.y, -direction.x)
+	return Vector2i(direction.y, direction.x)
+
+
+func add_ray(ray: LightRay) -> LightRay:
+	_rays.append(ray)
+	_dirty = true
+	return ray
+
+
+func rays() -> Array[LightRay]:
+	return _rays
+
+
+func get_ray(id: String) -> LightRay:
+	for ray in _rays:
+		if ray.id == id:
+			return ray
+	return null
+
+
+func set_ray_enabled(id: String, enabled: bool) -> void:
+	var ray := get_ray(id)
+	if ray == null or ray.enabled == enabled:
+		return
+	ray.enabled = enabled
+	_dirty = true
+
+
+## The cells a ray actually lights, in order — the same walk the renderer and
+## any test can inspect, so "where does the beam go" has one answer.
+func trace_ray(ray: LightRay) -> Array[Vector2i]:
+	var path: Array[Vector2i] = []
+	var cell := ray.cell
+	var direction := ray.direction
+	var seen := {}
+	for step in ray.range_cells:
+		cell += direction
+		if not in_bounds(cell) or is_opaque(cell):
+			break
+		path.append(cell)
+		var orientation := mirror_at(cell)
+		if not orientation.is_empty():
+			direction = LightField.reflect(direction, orientation)
+			# A ring of mirrors would otherwise trap a ray forever.
+			var key := [cell, direction]
+			if seen.has(key):
+				break
+			seen[key] = true
+	return path
+
+
 func cast_ink(
 	cell: Vector2i, radius: float = 2.0, strength: float = 1.0, life: float = 5.0
 ) -> InkPuff:
@@ -260,6 +376,9 @@ func recompute() -> void:
 	for e in _emitters:
 		if e.enabled and e.intensity > 0.0:
 			_add_emitter_light(e)
+	for ray in _rays:
+		if ray.enabled and ray.intensity > 0.0:
+			_add_ray_light(ray)
 	for i in _nooks.size():
 		if _nooks[i] == 1:
 			_light[i] = 0.0
@@ -295,6 +414,17 @@ func _add_emitter_light(e: LightEmitter) -> void:
 
 ## Cells inside a beam's cone. The emitter's own cell always counts, so a beam
 ## source still glows where it stands.
+## A ray dims along its length rather than around a point, so a long reflected
+## path is visibly weaker at its end than at its source.
+func _add_ray_light(ray: LightRay) -> void:
+	var path := trace_ray(ray)
+	for i in path.size():
+		var falloff := 1.0 - float(i) / float(maxi(ray.range_cells, 1))
+		var value := ray.intensity * maxf(falloff, 0.25)
+		var idx := _index(path[i])
+		_light[idx] = maxf(_light[idx], value)
+
+
 func _within_cone(e: LightEmitter, dx: int, dy: int) -> bool:
 	var offset := Vector2(dx, dy)
 	if offset.length() < 0.001:

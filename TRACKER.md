@@ -32,8 +32,8 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R6 | Wardens + chamber progression | done | #47 | Warden's Walk; Game sequence |
 | R7 | The Orrery: orbiting lamps + sweeping beam | in_review | #48 | beams in LightField; floor −1 |
 | R8 | Candle Rows (floor −2) + tutorialisation | todo | — | teaches Cling before the Walk |
-| R9 | Candle Rows (floor −2) + whispers | in_review | — | teaches Cling; diegetic tutorial |
-| R10 | The Prism Hall: mirrors + refraction | todo | — | hardest puzzle floor |
+| R9 | Candle Rows (floor −2) + whispers | in_review | #50 | teaches Cling; diegetic tutorial |
+| R10 | The Prism Hall: mirrors + traced rays | in_review | — | turnable glass; floor +1 |
 | R11 | Progression, save, chamber select, memories | todo | — | permanent ink/coherence upgrades |
 | R12 | The Lantern Keeper + dual ending | todo | — | boss + finale |
 | R13 | Title, audio, touch polish, ship | todo | — | deploy to Pages |
@@ -41,6 +41,10 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 
 ## Log
 
+- **2026-09-08 · R10** — Rays and mirrors. Beams are traced cell by cell,
+  reflect off turnable glass and stop at walls, and Cling turns a mirror you
+  stand beside — the first thing in the Observatory that answers to the player.
+  The Prism Hall (floor +1) closes the climb for now.
 - **2026-09-08 · R9** — Candle Rows (floor −2) and whispers: teaching happens
   in the room, in her own voice, once, and fades on its own. No tooltips, no
   tutorial menu, no button that says "got it".
