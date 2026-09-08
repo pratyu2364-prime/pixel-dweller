@@ -6,7 +6,7 @@ reviewer: claude
 workers: [opencode/big-pickle, hermes/grok]   # codegen, in escalation order
 
 commands:                        # stack-specific; ship runs these locally pre-PR
-  test: "$HOME/.local/bin/godot --headless --path . --import && $HOME/.local/bin/godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit"
+  test: "$HOME/.local/bin/godot --headless --path . --import && $HOME/.local/bin/godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit && $HOME/.local/bin/godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests/proofs -gexit"
   lint: "gdlint scripts/ || true"
   build: ""                      # web export handled by deploy.yml on merge
 

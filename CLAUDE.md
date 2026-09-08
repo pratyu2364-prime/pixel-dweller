@@ -15,6 +15,11 @@ autonomous agent loop; the human only watches.
   during the PENUMBRA revamp.
 - **CI/CD:** GitHub Actions (`.github/workflows/`) test + ship to Pages.
 
+## Tests
+- `tests/` is the fast suite (seconds) — run it constantly.
+- `tests/proofs/` searches every chamber in space and time (a minute or two) and
+  runs as its own CI job. Anything that proves a *floor* belongs there.
+
 ## Hard rules
 - Web export must be **non-threaded** (GitHub Pages has no COOP/COEP headers).
 - Light is a **deterministic tile-grid sim** (`LightField`), never a GPU readback,

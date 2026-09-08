@@ -45,11 +45,15 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R19 | The Drowned Stair: tides | in_review | #60 | floor −4; the room itself floods |
 | R20 | The Lamplighter + The Long Gallery | in_review | #61 | an enemy that makes new light |
 | R21 | Prove the memories are collectable | in_review | #62 | prover routes through a via-cell |
-| R22 | What you remember: the collected lines | in_review | — | blanks show what is still down there |
+| R22 | What you remember: the collected lines | in_review | #63 | blanks show what is still down there |
+| R23 | Split the proofs into their own CI job | in_review | — | fast suite 1.9s, proofs 78s |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R23** — The proofs had grown to 78s and were sharing a job
+  with lint and export. Split: `tests/` stays a two-second suite, `tests/proofs/`
+  runs on its own with room to breathe.
 - **2026-09-08 · R22** — A page behind the title showing every line she has
   remembered, and a blank for every one she has not, in climb order so the gaps
   say where to look.
