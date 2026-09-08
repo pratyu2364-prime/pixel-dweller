@@ -18,7 +18,7 @@ func test_every_chamber_in_the_climb_exists_and_parses() -> void:
 
 
 func test_floors_follow_the_climb_order() -> void:
-	assert_eq(Game.next_after("cistern", ""), "warden_walk")
+	assert_eq(Game.next_after("cistern", ""), "orrery")
 	assert_eq(Game.next_after("warden_walk", ""), "", "the top of the stack ends the run")
 
 

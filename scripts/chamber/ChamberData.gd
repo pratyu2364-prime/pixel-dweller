@@ -34,6 +34,7 @@ var sunbeams: Array[Vector2i] = []
 var nooks: Array[Vector2i] = []
 var lights: Array[Dictionary] = []  ## {id, cell, radius, intensity, kind}
 var wardens: Array[Dictionary] = []  ## {id, waypoints, mode, speed, lantern}
+var movers: Array[Dictionary] = []  ## orbiting lamps and sweeping beams
 var next_id: String = ""  ## the chamber this one leads to; empty ends the run
 var parse_errors: Array[String] = []
 
@@ -91,6 +92,10 @@ func _read_front_matter(line: String) -> void:
 			next_id = value
 		"warden":
 			_read_warden(value)
+		"orbit":
+			_read_mover(MovingLight.Kind.ORBIT, value)
+		"sweep":
+			_read_mover(MovingLight.Kind.SWEEP, value)
 		_:
 			parse_errors.append("unknown key: %s" % key)
 
@@ -130,6 +135,13 @@ func _read_warden(value: String) -> void:
 	if waypoints.size() < 2:
 		parse_errors.append("warden %s needs at least two route points" % warden["id"])
 	wardens.append(warden)
+
+
+func _read_mover(kind: int, value: String) -> void:
+	var mover := MovingLight.from_tokens(kind, value, movers.size())
+	for error in mover["errors"]:
+		parse_errors.append("mover %s: %s" % [mover["id"], error])
+	movers.append(mover)
 
 
 func _read_map(map_lines: Array[String]) -> void:
@@ -218,6 +230,8 @@ func build_field() -> LightField:
 		field.set_nook(cell, true)
 	for light in lights:
 		field.emit(light["id"], light["cell"], light["radius"], light["intensity"])
+	for definition in movers:
+		MovingLight.from_definition(definition).install(field, definition["light"])
 	return field
 
 

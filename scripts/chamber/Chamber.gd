@@ -25,6 +25,7 @@ var cling: ClingController
 var hud: Hud
 var renderer: ChamberRenderer
 var wardens: Array[Warden] = []
+var movers: Array[MovingLight] = []
 
 var _exit_fired: bool = false
 
@@ -40,6 +41,8 @@ func load_chamber(path: String) -> void:
 		return
 	field = data.build_field()
 	cling = ClingController.new(field, data.lights)
+	for definition in data.movers:
+		movers.append(MovingLight.from_definition(definition))
 	_build_walls()
 	_spawn_renderer()
 	_spawn_umbra()
@@ -152,6 +155,9 @@ func _process(delta: float) -> void:
 	if field == null:
 		return
 	field.advance(delta)
+	for mover in movers:
+		mover.advance(delta)
+		mover.apply(field)
 	if umbra != null:
 		cling.tick(delta, umbra.current_cell(), umbra.is_clinging())
 		_update_hud()

@@ -34,6 +34,13 @@ class LightEmitter:
 	var radius: float
 	var intensity: float
 	var enabled: bool
+	## A beam: emitter light is confined to a cone. `cone_half_angle` of TAU
+	## (the default) means an ordinary lamp shining every way at once.
+	var direction: Vector2 = Vector2.RIGHT
+	var cone_half_angle: float = TAU
+
+	func is_beam() -> bool:
+		return cone_half_angle < PI
 
 	func _init(
 		p_id: String,
@@ -278,10 +285,33 @@ func _add_emitter_light(e: LightEmitter) -> void:
 			var value := e.intensity * falloff * falloff
 			if value <= 0.0:
 				continue
+			if e.is_beam() and not _within_cone(e, dx, dy):
+				continue
 			if not _has_line_of_sight(e.cell, cell):
 				continue
 			var idx := _index(cell)
 			_light[idx] = maxf(_light[idx], value)
+
+
+## Cells inside a beam's cone. The emitter's own cell always counts, so a beam
+## source still glows where it stands.
+func _within_cone(e: LightEmitter, dx: int, dy: int) -> bool:
+	var offset := Vector2(dx, dy)
+	if offset.length() < 0.001:
+		return true
+	return absf(e.direction.angle_to(offset.normalized())) <= e.cone_half_angle
+
+
+## Aim a beam. Widening past PI turns it back into an ordinary lamp.
+func aim_emitter(id: String, direction: Vector2, half_angle: float = -1.0) -> void:
+	var e := get_emitter(id)
+	if e == null:
+		return
+	if direction.length() > 0.001:
+		e.direction = direction.normalized()
+	if half_angle >= 0.0:
+		e.cone_half_angle = half_angle
+	_dirty = true
 
 
 func _subtract_ink(puff: InkPuff) -> void:
