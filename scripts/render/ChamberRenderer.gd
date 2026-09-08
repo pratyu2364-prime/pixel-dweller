@@ -14,6 +14,8 @@ var _image: Image
 var _texture: ImageTexture
 var _material: ShaderMaterial
 var _time: float = 0.0
+var _shake: float = 0.0
+var _shake_origin: Vector2 = Vector2.ZERO
 
 
 func setup(p_data: ChamberData, p_field: LightField) -> void:

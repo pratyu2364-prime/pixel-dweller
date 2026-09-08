@@ -10,7 +10,8 @@ extends Node2D
 
 signal exit_reached
 signal umbra_scattered(cell: Vector2i)
-signal ending_reached(kind: String)  ## "free" — the Lamp is out; "rejoin" — the stair
+signal ending_reached(kind: String)
+signal restart_requested  ## "free" — the Lamp is out; "rejoin" — the stair
 
 const CELL := ChamberData.CELL_SIZE
 const INK_RADIUS := 2.2
@@ -31,6 +32,10 @@ var touch: TouchPad
 var keeper: Keeper
 var chain: LampChain
 var sound: Sound
+var card: FloorCard
+var pause_menu: PauseMenu
+var _camera: Camera2D
+var _shake: float = 0.0
 var _whispers_said: Dictionary = {}
 
 var _exit_fired: bool = false
@@ -57,6 +62,8 @@ func load_chamber(path: String) -> void:
 	_spawn_chain()
 	_spawn_keeper()
 	_spawn_hud()
+	_spawn_card()
+	_spawn_pause()
 
 
 ## Behind everything, so Umbra reads as a hole punched in the light.
@@ -106,6 +113,7 @@ func _spawn_umbra() -> void:
 	umbra.cling_released.connect(cling.release_press)
 	_attach_camera()
 	umbra.scattered_at.connect(func(cell: Vector2i) -> void: umbra_scattered.emit(cell))
+	umbra.scattered_at.connect(func(_cell: Vector2i) -> void: _shake = 1.0)
 
 
 ## Held close so a room reads as a claustrophobic pool of dark, and clamped to
@@ -123,6 +131,7 @@ func _attach_camera() -> void:
 	camera.limit_bottom = int(bounds.end.y)
 	umbra.add_child(camera)
 	camera.make_current()
+	_camera = camera
 
 
 ## The Great Lamp cannot be touched while its feeders burn, so the finale is
@@ -198,6 +207,44 @@ func _spawn_hud() -> void:
 	_wire_touch()
 
 
+func _spawn_card() -> void:
+	card = FloorCard.new()
+	card.name = "FloorCard"
+	add_child(card)
+	card.present(data.title, data.subtitle)
+
+
+func _spawn_pause() -> void:
+	pause_menu = PauseMenu.new()
+	pause_menu.name = "PauseMenu"
+	add_child(pause_menu)
+	pause_menu.restart_requested.connect(_on_restart)
+	pause_menu.quit_requested.connect(_on_quit)
+
+
+func _on_restart() -> void:
+	pause_menu.close()
+	restart_requested.emit()
+
+
+func _on_quit() -> void:
+	pause_menu.close()
+	get_tree().change_scene_to_file("res://scenes/Title.tscn")
+
+
+## The frame kicks when she comes apart — the only screen shake in the game, so
+## it still means something when it happens.
+func _shake_camera(delta: float) -> void:
+	if _camera == null:
+		return
+	if _shake <= 0.0:
+		_camera.offset = Vector2.ZERO
+		return
+	_shake = maxf(0.0, _shake - delta * 3.0)
+	var amount := _shake * 6.0
+	_camera.offset = Vector2(randf_range(-amount, amount), randf_range(-amount, amount))
+
+
 func _wire_touch() -> void:
 	touch = TouchPad.new()
 	touch.name = "TouchPad"
@@ -236,6 +283,7 @@ func _process(delta: float) -> void:
 		umbra.touch_direction = touch.direction
 	if keeper != null and umbra != null:
 		keeper.follow(umbra.current_cell())
+	_shake_camera(delta)
 	_check_whispers()
 	if renderer != null:
 		renderer.advance(delta, ChamberRenderer.dread_for(umbra.state if umbra else null))
