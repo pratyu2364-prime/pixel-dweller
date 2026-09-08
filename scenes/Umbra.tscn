@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://cumbrapenumbra01"]
+
+[ext_resource type="Script" path="res://scripts/umbra/Umbra.gd" id="1_umbra"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_umbra"]
+radius = 5.0
+
+[node name="Umbra" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_umbra")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_umbra")
+
+[node name="Blot" type="Polygon2D" parent="."]
+color = Color(0.043137, 0.031373, 0.070588, 1)
+polygon = PackedVector2Array(-6, -2, -4, -6, 0, -7, 4, -6, 6, -2, 5, 3, 2, 7, -2, 7, -5, 3)
