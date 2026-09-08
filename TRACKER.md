@@ -33,14 +33,17 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R7 | The Orrery: orbiting lamps + sweeping beam | in_review | #48 | beams in LightField; floor −1 |
 | R8 | Candle Rows (floor −2) + tutorialisation | todo | — | teaches Cling before the Walk |
 | R9 | Candle Rows (floor −2) + whispers | in_review | #50 | teaches Cling; diegetic tutorial |
-| R10 | The Prism Hall: mirrors + traced rays | in_review | — | turnable glass; floor +1 |
-| R11 | Progression, save, chamber select, memories | todo | — | permanent ink/coherence upgrades |
+| R10 | The Prism Hall: mirrors + traced rays | in_review | #51 | turnable glass; floor +1 |
+| R11 | Title + save/progress + touch controls | in_review | — | phone-playable; descend where you left off |
 | R12 | The Lantern Keeper + dual ending | todo | — | boss + finale |
 | R13 | Title, audio, touch polish, ship | todo | — | deploy to Pages |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R11** — A way in and a way back: title screen, a save that
+  remembers the deepest floor and what it cost, and floating-thumbstick touch
+  controls so this is playable on a phone.
 - **2026-09-08 · R10** — Rays and mirrors. Beams are traced cell by cell,
   reflect off turnable glass and stop at walls, and Cling turns a mirror you
   stand beside — the first thing in the Observatory that answers to the player.
