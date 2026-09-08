@@ -16,6 +16,7 @@ const FLOOR_NAMES := {
 }
 
 var progress: Progress
+var options: PlayerOptions
 
 @onready var _continue_button: Button = $Menu/Continue
 @onready var _begin_button: Button = $Menu/Begin
@@ -24,9 +25,39 @@ var progress: Progress
 
 func _ready() -> void:
 	progress = Progress.load_from()
+	options = PlayerOptions.load_from()
+	_build_options_row()
 	_begin_button.pressed.connect(func() -> void: _start(Progress.FIRST_CHAMBER))
 	_continue_button.pressed.connect(func() -> void: _start(progress.reached))
 	refresh()
+
+
+## Three toggles, in the language of the game rather than of a settings menu.
+func _build_options_row() -> void:
+	var row := VBoxContainer.new()
+	row.name = "Options"
+	row.add_theme_constant_override("separation", 6)
+	$Menu.add_child(row)
+	_add_toggle(row, "gentle · the light bites softer", options.gentle, func(on: bool) -> void:
+		options.gentle = on
+	)
+	_add_toggle(row, "high contrast", options.high_contrast, func(on: bool) -> void:
+		options.high_contrast = on
+	)
+	_add_toggle(row, "still flames · no shake", options.reduced_motion, func(on: bool) -> void:
+		options.reduced_motion = on
+	)
+
+
+func _add_toggle(parent: Node, label: String, value: bool, apply: Callable) -> void:
+	var button := CheckButton.new()
+	button.text = label
+	button.button_pressed = value
+	button.toggled.connect(func(on: bool) -> void:
+		apply.call(on)
+		options.save()
+	)
+	parent.add_child(button)
 
 
 func refresh() -> void:

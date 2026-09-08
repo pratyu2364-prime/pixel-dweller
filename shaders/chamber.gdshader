@@ -12,7 +12,9 @@ uniform sampler2D light_tex : filter_linear, repeat_disable;
 uniform vec2 grid_size = vec2(40.0, 22.0);
 uniform float shade_max = 0.35;
 uniform float time_seconds = 0.0;
-uniform float dread = 0.0;  // 0 safe .. 1 scattering: the room reacts to her
+uniform float dread = 0.0;
+uniform float contrast_boost = 0.0;  // accessibility: widen shade vs glare
+uniform float flicker_amount = 1.0;  // accessibility: 0 stills every flame  // 0 safe .. 1 scattering: the room reacts to her
 
 uniform vec3 void_color : source_color = vec3(0.031, 0.031, 0.059);
 uniform vec3 shade_color : source_color = vec3(0.071, 0.086, 0.157);
@@ -51,11 +53,17 @@ void fragment() {
 
 	// Lights breathe. A candle that never flickers is a number, not a flame.
 	float flicker = 0.94 + 0.06 * sin(time_seconds * 7.3 + hash(floor(cell)) * 24.0);
-	level *= mix(1.0, flicker, step(0.02, level));
+	level *= mix(1.0, mix(1.0, flicker, flicker_amount), step(0.02, level));
 
 	level = clamp(level + (bayer(pixel) - 0.5) * 0.07, 0.0, 1.0);
 
 	vec3 color;
+	// High contrast pushes shade darker and glare brighter around the same
+	// threshold, so the line between safe and not is where it always was.
+	if (contrast_boost > 0.0) {
+		float pushed = clamp((level - shade_max) * 1.9 + shade_max, 0.0, 1.0);
+		level = mix(level, pushed, contrast_boost);
+	}
 	if (level <= shade_max) {
 		color = mix(void_color, shade_color, level / shade_max);
 	} else {

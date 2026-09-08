@@ -30,6 +30,8 @@ const GLARE_SPEED_PENALTY := 0.5
 ## the light and how much dark she can carry.
 var bonus_coherence: float = 0.0
 var bonus_ink: float = 0.0
+## Gentle mode scales the drain and nothing else. The rooms do not change.
+var drain_scale: float = 1.0
 
 var coherence: float = MAX_COHERENCE
 var ink: float = MAX_INK
@@ -84,7 +86,7 @@ func tick(delta: float, glare: float, deep_shade: bool) -> void:
 	var before_ink := ink
 
 	if glare > 0.0:
-		coherence = maxf(0.0, coherence - DRAIN_PER_SECOND * glare * delta)
+		coherence = maxf(0.0, coherence - DRAIN_PER_SECOND * drain_scale * glare * delta)
 		_regen_cooldown = REGEN_DELAY
 	else:
 		_regen_cooldown = maxf(0.0, _regen_cooldown - delta)

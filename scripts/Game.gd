@@ -23,6 +23,7 @@ const DEFAULT_ORDER: Array[String] = [
 var chamber: Chamber
 var current_id: String = ""
 var progress: Progress = Progress.new()
+var options: PlayerOptions = PlayerOptions.new()
 
 ## Set by the title screen before the scene swaps, so Game does not have to
 ## know a title screen exists.
@@ -35,6 +36,7 @@ var _swapping: bool = false
 func _ready() -> void:
 	_build_fade()
 	progress = Progress.load_from()
+	options = PlayerOptions.load_from()
 	var first := pending_chamber if not pending_chamber.is_empty() else start_chamber
 	pending_chamber = ""
 	enter(first)
@@ -80,6 +82,7 @@ func enter(id: String) -> void:
 	chamber.ending_reached.connect(_on_ending_reached, CONNECT_ONE_SHOT)
 	chamber.restart_requested.connect(func() -> void: enter(current_id))
 	chamber.progress = progress
+	chamber.options = options
 	chamber.apply_boons()
 	chamber.memory_found.connect(func(_id: String, _text: String) -> void: progress.save())
 	progress.enter(id, DEFAULT_ORDER)
