@@ -37,11 +37,16 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R11 | Title + save/progress + touch controls | in_review | #52 | phone-playable; descend where you left off |
 | R12 | The Lantern Room: Keeper + dual ending | in_review | #53 | the climb is completable end to end |
 | R13 | Procedural audio + README + ship | in_review | #54 | zero audio files; six generated voices |
-| R14 | ChamberProver: fairness proof per floor | in_review | — | searches space+time; runs in CI |
+| R14 | ChamberProver: fairness proof per floor | in_review | #55 | searches space+time; runs in CI |
+| R15 | Presentation: name, floor cards, pause, shake | in_review | — | project is now PENUMBRA |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R15** — The project is called what the game is called. Floor
+  cards name each chamber on arrival and leave on their own, a pause menu can
+  always start a floor over (a puzzle game that can be soft-locked is a broken
+  one), and the frame kicks exactly once — when she scatters.
 - **2026-09-08 · R14** — Fairness is proved, not eyeballed. ChamberProver
   searches each floor in space *and time* and every chamber in the climb now
   ships with a proof that a route exists which never stands in glare.
