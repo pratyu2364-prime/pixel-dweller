@@ -1,6 +1,6 @@
 id: lantern_room
 title: The Lantern Room
-subtitle: floor +2 · the light that made you
+subtitle: floor +3 · the light that made you
 ambient: 0.06
 next: 
 keeper: at=(18,3)

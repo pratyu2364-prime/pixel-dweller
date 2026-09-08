@@ -100,6 +100,8 @@ func _read_front_matter(line: String) -> void:
 			next_id = value
 		"warden":
 			_read_warden(value)
+		"lamplighter":
+			_read_warden(value, true)
 		"tide":
 			_read_tide(value)
 		"keeper":
@@ -123,8 +125,9 @@ func _read_front_matter(line: String) -> void:
 ## `warden: id=w1 route=(5,3)>(20,3) mode=pingpong speed=2.4 lantern=6`
 ## Routes live in front matter rather than in glyphs because a beat is a path,
 ## and a path drawn in ASCII stops being readable the moment two of them cross.
-func _read_warden(value: String) -> void:
+func _read_warden(value: String, lights_as_it_goes: bool = false) -> void:
 	var warden := {
+		"lamplighter": lights_as_it_goes,
 		"id": "warden_%d" % wardens.size(),
 		"waypoints": [] as Array[Vector2i],
 		"mode": PatrolRoute.Mode.PING_PONG,

@@ -12,8 +12,9 @@ const FLOOR_NAMES := {
 	"candle_rows": "−2 · Candle Rows",
 	"orrery": "−1 · The Orrery",
 	"warden_walk": "0 · Warden's Walk",
-	"prism_hall": "+1 · The Prism Hall",
-	"lantern_room": "+2 · The Lantern Room",
+	"long_gallery": "+1 · The Long Gallery",
+	"prism_hall": "+2 · The Prism Hall",
+	"lantern_room": "+3 · The Lantern Room",
 }
 
 var progress: Progress
