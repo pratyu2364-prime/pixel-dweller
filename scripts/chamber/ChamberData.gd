@@ -35,6 +35,7 @@ var nooks: Array[Vector2i] = []
 var lights: Array[Dictionary] = []  ## {id, cell, radius, intensity, kind}
 var wardens: Array[Dictionary] = []  ## {id, waypoints, mode, speed, lantern}
 var movers: Array[Dictionary] = []  ## orbiting lamps and sweeping beams
+var whispers: Array[Dictionary] = []  ## {cell, radius, text}
 var next_id: String = ""  ## the chamber this one leads to; empty ends the run
 var parse_errors: Array[String] = []
 
@@ -92,6 +93,8 @@ func _read_front_matter(line: String) -> void:
 			next_id = value
 		"warden":
 			_read_warden(value)
+		"whisper":
+			_read_whisper(value)
 		"orbit":
 			_read_mover(MovingLight.Kind.ORBIT, value)
 		"sweep":
@@ -135,6 +138,28 @@ func _read_warden(value: String) -> void:
 	if waypoints.size() < 2:
 		parse_errors.append("warden %s needs at least two route points" % warden["id"])
 	wardens.append(warden)
+
+
+## `whisper: at=(3,5) radius=3 the light does not like you`
+## Teaching happens in the room, in her own voice, once — never in a tooltip
+## and never in a menu the player has to be told to open.
+func _read_whisper(value: String) -> void:
+	var whisper := {"cell": Vector2i.ZERO, "radius": 3.0, "text": ""}
+	var words: Array[String] = []
+	for token in value.split(" ", false):
+		var text := String(token)
+		var pair := text.split("=", true, 1)
+		if pair.size() == 2 and pair[0] == "at":
+			var point := MovingLight._parse_point(pair[1])
+			whisper["cell"] = Vector2i(roundi(point.x), roundi(point.y))
+		elif pair.size() == 2 and pair[0] == "radius":
+			whisper["radius"] = pair[1].to_float()
+		else:
+			words.append(text)
+	whisper["text"] = " ".join(words)
+	if whisper["text"].is_empty():
+		parse_errors.append("whisper at %s has nothing to say" % whisper["cell"])
+	whispers.append(whisper)
 
 
 func _read_mover(kind: int, value: String) -> void:
