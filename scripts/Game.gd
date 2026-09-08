@@ -79,6 +79,9 @@ func enter(id: String) -> void:
 	chamber.umbra_scattered.connect(_on_scattered)
 	chamber.ending_reached.connect(_on_ending_reached, CONNECT_ONE_SHOT)
 	chamber.restart_requested.connect(func() -> void: enter(current_id))
+	chamber.progress = progress
+	chamber.apply_boons()
+	chamber.memory_found.connect(func(_id: String, _text: String) -> void: progress.save())
 	progress.enter(id, DEFAULT_ORDER)
 	progress.save()
 	chamber_entered.emit(id)

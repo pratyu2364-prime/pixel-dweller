@@ -42,16 +42,20 @@ func refresh() -> void:
 static func subtitle_for(state: Progress) -> String:
 	if not state.has_started():
 		return ""
+	var remembered := ""
+	if state.memories.size() > 0:
+		remembered = " · %d remembered" % state.memories.size()
 	if state.has_finished():
 		if state.endings.size() > 1:
 			return "you have gone out, and you have gone back"
-		return "you snuffed the lamp" if state.endings.has("free") else "you went back to them"
+		var ending := "you snuffed the lamp" if state.endings.has("free") else "you went back to them"
+		return ending + remembered
 	var floor_name: String = FLOOR_NAMES.get(state.reached, state.reached)
 	if state.scatters == 0:
-		return "%s · never yet scattered" % floor_name
+		return "%s · never yet scattered%s" % [floor_name, remembered]
 	if state.scatters == 1:
-		return "%s · scattered once" % floor_name
-	return "%s · scattered %d times" % [floor_name, state.scatters]
+		return "%s · scattered once%s" % [floor_name, remembered]
+	return "%s · scattered %d times%s" % [floor_name, state.scatters, remembered]
 
 
 func _start(chamber: String) -> void:

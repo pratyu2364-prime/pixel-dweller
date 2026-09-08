@@ -7,10 +7,11 @@ whisper: at=(2,2) radius=3 you came loose. the dark still fits you
 whisper: at=(9,2) radius=4 the lamp ahead will eat you. go around it
 whisper: at=(20,10) radius=5 throw the dark you carry — it will hold, for a while
 whisper: at=(36,20) radius=4 down here the light is only sleeping
+memory: at=(36,2) she left a window open once, and you lay along the sill
 
 ########################################
 #~~....................................#
-#~@...................................o#
+#~@.................................*.o#
 #~~....................................#
 #....########################.....######
 #....#......................#.........s#

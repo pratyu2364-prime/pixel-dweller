@@ -37,6 +37,8 @@ var wardens: Array[Dictionary] = []  ## {id, waypoints, mode, speed, lantern}
 var movers: Array[Dictionary] = []  ## orbiting lamps and sweeping beams
 var mirrors: Array[Dictionary] = []  ## {cell, orientation}
 var rays: Array[Dictionary] = []  ## {id, cell, direction, intensity, range}
+var memories: Array[Dictionary] = []  ## {cell, text}
+var _memory_lines: Dictionary = {}  ## cell -> text, bound to glyphs after the map
 var whispers: Array[Dictionary] = []  ## {cell, radius, text}
 var keeper_cell: Vector2i = Vector2i(-1, -1)
 var chain: Dictionary = {}  ## {great: Vector2i, feeders: Array[Vector2i]}
@@ -103,6 +105,8 @@ func _read_front_matter(line: String) -> void:
 			_read_chain(value)
 		"ray":
 			_read_ray(value)
+		"memory":
+			_read_memory(value)
 		"whisper":
 			_read_whisper(value)
 		"orbit":
@@ -231,6 +235,26 @@ func _read_ray(value: String) -> void:
 	rays.append(ray)
 
 
+## `memory: at=(21,6) she left a window open, once, and you touched the sill`
+## The glyph places it; this line gives it something to say. A memory with no
+## line is a pickup, and PENUMBRA does not want pickups.
+func _read_memory(value: String) -> void:
+	var cell := Vector2i(-1, -1)
+	var words: Array[String] = []
+	for token in value.split(" ", false):
+		var pair := String(token).split("=", true, 1)
+		if pair.size() == 2 and pair[0] == "at":
+			var point := MovingLight._parse_point(pair[1])
+			cell = Vector2i(roundi(point.x), roundi(point.y))
+		else:
+			words.append(String(token))
+	if cell == Vector2i(-1, -1) or words.is_empty():
+		parse_errors.append("a memory needs a place and something to say")
+		return
+	# Front matter is read before the map, so the line waits for its glyph.
+	_memory_lines[cell] = " ".join(words)
+
+
 func _read_whisper(value: String) -> void:
 	var whisper := {"cell": Vector2i.ZERO, "radius": 3.0, "text": ""}
 	var words: Array[String] = []
@@ -283,6 +307,8 @@ func _read_map(map_lines: Array[String]) -> void:
 					mirrors.append({"cell": cell, "orientation": glyph})
 				"s":
 					sunbeams.append(cell)
+				"*":
+					memories.append({"cell": cell, "text": ""})
 				"@":
 					spawn = cell
 					found_spawn = true
@@ -301,6 +327,16 @@ func _read_map(map_lines: Array[String]) -> void:
 					light_index += 1
 				_:
 					parse_errors.append("unknown glyph '%s' at %d,%d" % [glyph, x, y])
+	for memory in memories:
+		memory["text"] = String(_memory_lines.get(memory["cell"], ""))
+		if String(memory["text"]).is_empty():
+			parse_errors.append("the memory at %s has nothing to say" % memory["cell"])
+	for cell in _memory_lines:
+		var placed := false
+		for memory in memories:
+			placed = placed or memory["cell"] == cell
+		if not placed:
+			parse_errors.append("memory line at %s has no * on the map" % cell)
 	if not found_spawn:
 		parse_errors.append("chamber has no @ spawn")
 

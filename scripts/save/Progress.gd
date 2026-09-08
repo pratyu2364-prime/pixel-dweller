@@ -15,10 +15,41 @@ var seconds_played: float = 0.0
 ## Which endings she has seen. Both can be true: the game invites a second climb
 ## rather than grading the first.
 var endings: Dictionary = {}
+## Memory ids she has picked up, as "<chamber>:<x>,<y>" — stable across a
+## rebuild of the chamber, so a memory is found once and stays found.
+var memories: Dictionary = {}
+
+const COHERENCE_PER_MEMORY := 12.0
+const INK_PER_TWO_MEMORIES := 1.0
 
 
 func has_started() -> bool:
 	return reached != FIRST_CHAMBER or not completed.is_empty() or scatters > 0
+
+
+static func memory_id(chamber: String, cell: Vector2i) -> String:
+	return "%s:%d,%d" % [chamber, cell.x, cell.y]
+
+
+func has_memory(id: String) -> bool:
+	return memories.has(id)
+
+
+func remember(id: String) -> bool:
+	if memories.has(id):
+		return false
+	memories[id] = true
+	return true
+
+
+## What everything she has remembered is worth: a longer breath in the light,
+## and a little more dark to throw.
+func boons() -> Dictionary:
+	var found := memories.size()
+	return {
+		"coherence": float(found) * COHERENCE_PER_MEMORY,
+		"ink": floor(float(found) / 2.0) * INK_PER_TWO_MEMORIES,
+	}
 
 
 func has_finished() -> bool:
@@ -60,6 +91,7 @@ func to_dict() -> Dictionary:
 		"scatters": scatters,
 		"seconds_played": seconds_played,
 		"endings": endings.keys(),
+		"memories": memories.keys(),
 	}
 
 
@@ -72,6 +104,8 @@ static func from_dict(data: Dictionary) -> Progress:
 		progress.completed.append(String(id))
 	for kind in data.get("endings", []):
 		progress.endings[String(kind)] = true
+	for id in data.get("memories", []):
+		progress.memories[String(id)] = true
 	return progress
 
 
