@@ -27,10 +27,10 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R1 | `LightField` — deterministic tile light sim | done | #42 | 18 tests; occlusion, ink, nooks |
 | R2 | Umbra: coherence + ink + scatter/reform | done | #43 | ShadowState pure logic |
 | R3 | Chamber format + loader (ASCII → room) | done | #44 | The Cistern playable |
-| R4 | Cling + HUD | in_review | #45 | carry candles, smother braziers |
-| R5 | Renderer: shader-driven look, Umbra as a hole | in_review | #46 | field → texture → palette |
-| R6 | Wardens + chamber progression | in_review | — | Warden's Walk; Game sequence |
-| R7 | The Orrery: moving lights, rotating beams | todo | — | combines cast + carry |
+| R4 | Cling + HUD | done | #45 | carry candles, smother braziers |
+| R5 | Renderer: shader-driven look, Umbra as a hole | done | #46 | field → texture → palette |
+| R6 | Wardens + chamber progression | in_review | #47 | Warden's Walk; Game sequence |
+| R7 | The Orrery: orbiting lamps + sweeping beam | in_review | — | beams in LightField; floor −1 |
 | R8 | Candle Rows (floor −2) + tutorialisation | todo | — | teaches Cling before the Walk |
 | R9 | The Prism Hall: mirrors + refraction | todo | — | hardest puzzle floor |
 | R10 | Progression, save, chamber select, memories | todo | — | permanent ink/coherence upgrades |
@@ -40,6 +40,10 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 
 ## Log
 
+- **2026-09-08 · R7** — Light that will not hold still. Beam cones in the
+  LightField, orbiting lamps and a sweeping eye declared in front matter, and
+  The Orrery (floor −1) built around them. Everything is a function of time, so
+  a rhythm can be learned; nothing here is random.
 - **2026-09-08 · R6** — Wardens exist. They never see Umbra; they notice
   *absence* — ink where light should be, or a light gone out — and walk over to
   put it back. The threat is not damage, it is that your darkness is borrowed.
