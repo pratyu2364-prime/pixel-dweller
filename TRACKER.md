@@ -44,11 +44,15 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R18 | Options: gentle, high contrast, still flames | in_review | #59 | plus renderer byte-buffer pass |
 | R19 | The Drowned Stair: tides | in_review | #60 | floor −4; the room itself floods |
 | R20 | The Lamplighter + The Long Gallery | in_review | #61 | an enemy that makes new light |
-| R21 | Prove the memories are collectable | in_review | — | prover routes through a via-cell |
+| R21 | Prove the memories are collectable | in_review | #62 | prover routes through a via-cell |
+| R22 | What you remember: the collected lines | in_review | — | blanks show what is still down there |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R22** — A page behind the title showing every line she has
+  remembered, and a blank for every one she has not, in climb order so the gaps
+  say where to look.
 - **2026-09-08 · R21** — The prover can now be told to route *through* a cell,
   which turns "is this memory actually gettable, and can she still finish after
   taking it" from a hope into a test — including that the detour costs
