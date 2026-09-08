@@ -33,6 +33,8 @@ var walls: Array[Vector2i] = []
 var sunbeams: Array[Vector2i] = []
 var nooks: Array[Vector2i] = []
 var lights: Array[Dictionary] = []  ## {id, cell, radius, intensity, kind}
+var wardens: Array[Dictionary] = []  ## {id, waypoints, mode, speed, lantern}
+var next_id: String = ""  ## the chamber this one leads to; empty ends the run
 var parse_errors: Array[String] = []
 
 var _rows: PackedStringArray = PackedStringArray()
@@ -85,8 +87,49 @@ func _read_front_matter(line: String) -> void:
 			subtitle = value
 		"ambient":
 			ambient = clampf(value.to_float(), 0.0, 1.0)
+		"next":
+			next_id = value
+		"warden":
+			_read_warden(value)
 		_:
 			parse_errors.append("unknown key: %s" % key)
+
+
+## `warden: id=w1 route=(5,3)>(20,3) mode=pingpong speed=2.4 lantern=6`
+## Routes live in front matter rather than in glyphs because a beat is a path,
+## and a path drawn in ASCII stops being readable the moment two of them cross.
+func _read_warden(value: String) -> void:
+	var warden := {
+		"id": "warden_%d" % wardens.size(),
+		"waypoints": [] as Array[Vector2i],
+		"mode": PatrolRoute.Mode.PING_PONG,
+		"speed": 2.4,
+		"lantern": 6.0,
+	}
+	for token in value.split(" ", false):
+		var pair := String(token).split("=", true, 1)
+		if pair.size() != 2:
+			parse_errors.append("bad warden token: %s" % token)
+			continue
+		match pair[0]:
+			"id":
+				warden["id"] = pair[1]
+			"route":
+				warden["waypoints"] = PatrolRoute.parse_waypoints(pair[1])
+			"mode":
+				warden["mode"] = (
+					PatrolRoute.Mode.LOOP if pair[1] == "loop" else PatrolRoute.Mode.PING_PONG
+				)
+			"speed":
+				warden["speed"] = pair[1].to_float()
+			"lantern":
+				warden["lantern"] = pair[1].to_float()
+			_:
+				parse_errors.append("unknown warden key: %s" % pair[0])
+	var waypoints: Array = warden["waypoints"]
+	if waypoints.size() < 2:
+		parse_errors.append("warden %s needs at least two route points" % warden["id"])
+	wardens.append(warden)
 
 
 func _read_map(map_lines: Array[String]) -> void:
