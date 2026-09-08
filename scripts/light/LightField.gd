@@ -19,6 +19,7 @@ var ambient: float
 var _light: PackedFloat32Array
 var _ambient_cells: PackedFloat32Array
 var _opaque: PackedByteArray
+var _nooks: PackedByteArray
 var _emitters: Array[LightEmitter] = []
 var _inks: Array[InkPuff] = []
 var _dirty: bool = true
@@ -89,6 +90,8 @@ func _init(p_width: int, p_height: int, p_ambient: float = 0.0) -> void:
 	_ambient_cells.fill(ambient)
 	_opaque = PackedByteArray()
 	_opaque.resize(count)
+	_nooks = PackedByteArray()
+	_nooks.resize(count)
 
 
 # --- geometry -----------------------------------------------------------------
@@ -116,6 +119,19 @@ func is_opaque(cell: Vector2i) -> bool:
 	if not in_bounds(cell):
 		return true
 	return _opaque[_index(cell)] == 1
+
+
+## A nook stays dark no matter what shines at it — a drape's shadow, a crack
+## under the stair. Guaranteed refuge, so a chamber always has a safe beat in it.
+func set_nook(cell: Vector2i, value: bool) -> void:
+	if not in_bounds(cell):
+		return
+	_nooks[_index(cell)] = 1 if value else 0
+	_dirty = true
+
+
+func is_nook(cell: Vector2i) -> bool:
+	return in_bounds(cell) and _nooks[_index(cell)] == 1
 
 
 ## Per-cell ambient override, e.g. a shaft of daylight baked into the chamber.
@@ -237,6 +253,9 @@ func recompute() -> void:
 	for e in _emitters:
 		if e.enabled and e.intensity > 0.0:
 			_add_emitter_light(e)
+	for i in _nooks.size():
+		if _nooks[i] == 1:
+			_light[i] = 0.0
 	for puff in _inks:
 		_subtract_ink(puff)
 	for i in _light.size():
