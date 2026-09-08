@@ -30,9 +30,24 @@ var route: Array[Vector2i] = []
 var _data: ChamberData
 var _snapshots: Array[LightField] = []
 
+## Snapshot sets are a pure function of (chamber, horizon), and the tests build
+## the same ones over and over, so they are shared rather than rebuilt.
+static var _snapshot_cache: Dictionary = {}
 
-func _init(data: ChamberData, horizon: int = DEFAULT_HORIZON) -> void:
+
+## When set, the search must pass through this cell before the exit counts —
+## used to prove a memory is not merely placed but actually collectable.
+var via: Vector2i = Vector2i(-1, -1)
+
+
+func _init(
+	data: ChamberData,
+	horizon: int = DEFAULT_HORIZON,
+	p_via: Vector2i = Vector2i(-1, -1),
+	max_budget: int = MAX_SPEND
+) -> void:
 	_data = data
+	via = p_via
 	# Snapshots wrap, so the horizon must cover a whole tide or the search would
 	# be reasoning about a cycle the room does not actually have.
 	if data.has_tide():
@@ -41,7 +56,7 @@ func _init(data: ChamberData, horizon: int = DEFAULT_HORIZON) -> void:
 	_build_snapshots(horizon)
 	# Cheapest first: a route that pays for one crossing is a better answer
 	# about a room than a faster route that pays for six.
-	for budget in range(0, MAX_SPEND + 1):
+	for budget in range(0, mini(max_budget, MAX_SPEND) + 1):
 		_search(budget)
 		if reachable:
 			return
@@ -51,6 +66,10 @@ func _init(data: ChamberData, horizon: int = DEFAULT_HORIZON) -> void:
 ## advances it. Snapshots are shared by every state at that instant, so the
 ## search costs no more than the simulation does.
 func _build_snapshots(horizon: int) -> void:
+	var key := "%s@%d" % [_data.signature(), horizon]
+	if _snapshot_cache.has(key):
+		_snapshots = _snapshot_cache[key]
+		return
 	for slice in horizon:
 		var field := _data.build_field()
 		var movers: Array[MovingLight] = []
@@ -63,6 +82,7 @@ func _build_snapshots(horizon: int) -> void:
 		if tide != null:
 			tide.apply(field, SLICE_SECONDS * float(slice))
 		_snapshots.append(field)
+	_snapshot_cache[key] = _snapshots
 
 
 func snapshot(slice: int) -> LightField:
@@ -80,10 +100,11 @@ func is_deep(cell: Vector2i, slice: int) -> bool:
 ## Ink refills, so a state has to remember how many crossings it has paid for
 ## as well as what it is carrying — otherwise a route that spends three charges
 ## and recharges reads as free.
-func _key(cell: Vector2i, slice: int, ink: int, spent: int) -> int:
+func _key(cell: Vector2i, slice: int, ink: int, spent: int, been: bool) -> int:
 	var wrapped := slice % _snapshots.size()
 	var place := (cell.y * _data.width + cell.x) * _snapshots.size() + wrapped
-	return (place * (MAX_INK + 1) + ink) * (MAX_SPEND + 1) + spent
+	var base := (place * (MAX_INK + 1) + ink) * (MAX_SPEND + 1) + spent
+	return base * 2 + (1 if been else 0)
 
 
 ## Breadth-first over (cell, time, ink). Every edge is one time slice, so the
@@ -92,8 +113,10 @@ func _search(budget: int) -> void:
 	if not _data.is_valid():
 		return
 	var start := _data.spawn
-	var queue: Array = [[start, 0, MAX_INK, 0]]
-	var seen := {_key(start, 0, MAX_INK, 0): true}
+	var wants_detour := via != Vector2i(-1, -1)
+	var start_been := not wants_detour or start == via
+	var queue: Array = [[start, 0, MAX_INK, 0, start_been]]
+	var seen := {_key(start, 0, MAX_INK, 0, start_been): true}
 	var came_from := {}
 	var head := 0
 	while head < queue.size():
@@ -103,7 +126,8 @@ func _search(budget: int) -> void:
 		var slice: int = state[1]
 		var ink: int = state[2]
 		var spent: int = state[3]
-		if cell == _data.exit:
+		var been: bool = state[4]
+		if cell == _data.exit and been:
 			reachable = true
 			slices_taken = slice
 			ink_spent = spent
@@ -127,12 +151,13 @@ func _search(budget: int) -> void:
 				next_spent += 1
 			elif is_deep(next, next_slice) and next_ink < MAX_INK:
 				next_ink += 1
-			var key := _key(next, next_slice, next_ink, next_spent)
+			var next_been: bool = been or next == via
+			var key := _key(next, next_slice, next_ink, next_spent, next_been)
 			if seen.has(key):
 				continue
 			seen[key] = true
 			came_from[queue.size()] = head - 1
-			queue.append([next, next_slice, next_ink, next_spent])
+			queue.append([next, next_slice, next_ink, next_spent, next_been])
 	visited_states = seen.size()
 
 

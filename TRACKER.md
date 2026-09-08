@@ -43,11 +43,16 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R17 | AutoPlayer + light perf: walk the proof | in_review | #58 | 20x faster static light |
 | R18 | Options: gentle, high contrast, still flames | in_review | #59 | plus renderer byte-buffer pass |
 | R19 | The Drowned Stair: tides | in_review | #60 | floor −4; the room itself floods |
-| R20 | The Lamplighter + The Long Gallery | in_review | — | an enemy that makes new light |
+| R20 | The Lamplighter + The Long Gallery | in_review | #61 | an enemy that makes new light |
+| R21 | Prove the memories are collectable | in_review | — | prover routes through a via-cell |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R21** — The prover can now be told to route *through* a cell,
+  which turns "is this memory actually gettable, and can she still finish after
+  taking it" from a hope into a test — including that the detour costs
+  something, since a memory on the way is not a choice.
 - **2026-09-08 · R20** — A second kind of keeper: the Lamplighter, who does not
   relight what you snuffed but sets *new* candles as they walk. The Long Gallery
   (floor +1) is built around the pressure that creates — hesitate and the room

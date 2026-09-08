@@ -372,6 +372,12 @@ func _light(kind: String, index: int, cell: Vector2i, radius: float, intensity: 
 	}
 
 
+## Identity for caches: two chambers with the same id but different maps are
+## different chambers, and anything keyed on the id alone will mix them up.
+func signature() -> String:
+	return "%s:%dx%d:%d" % [id, width, height, hash("\n".join(_rows) + str(tide_definition))]
+
+
 func is_valid() -> bool:
 	return parse_errors.is_empty()
 
