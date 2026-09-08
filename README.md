@@ -18,6 +18,17 @@ reform in the nearest shade you could actually have reached.
 Coherence comes back in shade. **Ink** comes back only in *deep* shade. That one
 restriction is the whole loop: hide, charge, sprint the light, hide.
 
+## How to play
+
+Open the link, press **begin**, and read **how to play** if you want the rule
+before the room teaches it to you. The briefing is three cards — the rule, the
+verbs, the meters — and it is also on the pause menu (**escape**), because the
+verb you forget is the one you need halfway up a floor.
+
+Nothing in the game chases you and nothing can kill you but light. If you get
+stuck in a lit corner, pause and **start this floor over**; every floor is
+proved winnable without ever standing in light, so a room is never a trap.
+
 ## Three verbs
 
 | | keyboard | touch |

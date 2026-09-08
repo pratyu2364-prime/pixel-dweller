@@ -30,6 +30,7 @@ func _ready() -> void:
 	options = PlayerOptions.load_from()
 	_build_options_row()
 	_build_remembered()
+	_build_how_to_play()
 	_begin_button.pressed.connect(func() -> void: _start(Progress.FIRST_CHAMBER))
 	_continue_button.pressed.connect(func() -> void: _start(progress.reached))
 	refresh()
@@ -49,6 +50,20 @@ func _build_remembered() -> void:
 		page.present(progress)
 		page.visible = true
 	)
+	$Menu.add_child(button)
+
+
+## The briefing sits above the toggles because a first-time player needs it and
+## a returning one does not have to open it.
+func _build_how_to_play() -> void:
+	var page: HowToPlayScreen = load("res://scenes/HowToPlay.tscn").instantiate()
+	page.name = "HowToPlay"
+	page.visible = false
+	add_child(page)
+	var button := Button.new()
+	button.name = "HowToPlayButton"
+	button.text = "how to play"
+	button.pressed.connect(func() -> void: page.present())
 	$Menu.add_child(button)
 
 
