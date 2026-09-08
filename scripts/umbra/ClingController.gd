@@ -28,6 +28,9 @@ var held_id: String = ""
 var smother_id: String = ""
 var smother_progress: float = 0.0
 
+## Lights that refuse to be touched for now — the Great Lamp while it is still
+## fed. Locking is a rule of the room, not a state of the light.
+var _locked: Dictionary = {}
 var _lights: Dictionary = {}  ## id -> {kind, portable, base_intensity, snuffed}
 
 
@@ -46,6 +49,18 @@ func register(def: Dictionary) -> void:
 		"base_intensity": float(def.get("intensity", 1.0)),
 		"snuffed": false,
 	}
+
+
+func lock(id: String) -> void:
+	_locked[id] = true
+
+
+func unlock(id: String) -> void:
+	_locked.erase(id)
+
+
+func is_locked(id: String) -> bool:
+	return _locked.has(id)
 
 
 func is_portable(id: String) -> bool:
@@ -88,6 +103,8 @@ func press(cell: Vector2i) -> String:
 	var target := target_near(cell)
 	if target.is_empty():
 		return ""
+	if is_locked(target):
+		return "locked"
 	if is_portable(target):
 		_grab(target)
 		return "grab"
@@ -158,7 +175,7 @@ func smother_fraction() -> float:
 
 
 func snuff(id: String) -> bool:
-	if not _lights.has(id) or is_snuffed(id):
+	if not _lights.has(id) or is_snuffed(id) or is_locked(id):
 		return false
 	if held_id == id:
 		held_id = ""

@@ -38,6 +38,8 @@ var movers: Array[Dictionary] = []  ## orbiting lamps and sweeping beams
 var mirrors: Array[Dictionary] = []  ## {cell, orientation}
 var rays: Array[Dictionary] = []  ## {id, cell, direction, intensity, range}
 var whispers: Array[Dictionary] = []  ## {cell, radius, text}
+var keeper_cell: Vector2i = Vector2i(-1, -1)
+var chain: Dictionary = {}  ## {great: Vector2i, feeders: Array[Vector2i]}
 var next_id: String = ""  ## the chamber this one leads to; empty ends the run
 var parse_errors: Array[String] = []
 
@@ -95,6 +97,10 @@ func _read_front_matter(line: String) -> void:
 			next_id = value
 		"warden":
 			_read_warden(value)
+		"keeper":
+			_read_keeper(value)
+		"chain":
+			_read_chain(value)
 		"ray":
 			_read_ray(value)
 		"whisper":
@@ -148,6 +154,51 @@ func _read_warden(value: String) -> void:
 ## Teaching happens in the room, in her own voice, once — never in a tooltip
 ## and never in a menu the player has to be told to open.
 ## `ray: id=dawn cell=(1,9) dir=(1,0) range=34`
+func _read_keeper(value: String) -> void:
+	for token in value.split(" ", false):
+		var pair := String(token).split("=", true, 1)
+		if pair.size() == 2 and pair[0] == "at":
+			var point := MovingLight._parse_point(pair[1])
+			keeper_cell = Vector2i(roundi(point.x), roundi(point.y))
+		else:
+			parse_errors.append("bad keeper token: %s" % token)
+	if keeper_cell == Vector2i(-1, -1):
+		parse_errors.append("keeper has nowhere to start")
+
+
+## `chain: great=(18,9) feeders=(12,6),(21,6),(18,14)`
+## Written as cells rather than ids because a chamber file should not have to
+## know how light ids are numbered.
+func _read_chain(value: String) -> void:
+	var feeders: Array[Vector2i] = []
+	var great := Vector2i(-1, -1)
+	for token in value.split(" ", false):
+		var pair := String(token).split("=", true, 1)
+		if pair.size() != 2:
+			parse_errors.append("bad chain token: %s" % token)
+			continue
+		if pair[0] == "great":
+			var point := MovingLight._parse_point(pair[1])
+			great = Vector2i(roundi(point.x), roundi(point.y))
+		elif pair[0] == "feeders":
+			for part in pair[1].split("),", false):
+				var feeder := MovingLight._parse_point(part if part.ends_with(")") else part + ")")
+				feeders.append(Vector2i(roundi(feeder.x), roundi(feeder.y)))
+		else:
+			parse_errors.append("unknown chain key: %s" % pair[0])
+	if great == Vector2i(-1, -1) or feeders.is_empty():
+		parse_errors.append("a chain needs a great lamp and at least one feeder")
+	chain = {"great": great, "feeders": feeders}
+
+
+## The generated id of whatever light sits on a cell, or "" if none does.
+func light_id_at(cell: Vector2i) -> String:
+	for light in lights:
+		if light["cell"] == cell:
+			return String(light["id"])
+	return ""
+
+
 func _read_ray(value: String) -> void:
 	var ray := {
 		"id": "ray_%d" % rays.size(),

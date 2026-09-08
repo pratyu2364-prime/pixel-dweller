@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://cpenumbraending01"]
+
+[ext_resource type="Script" path="res://scripts/ui/Ending.gd" id="1_ending"]
+
+[node name="Ending" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_ending")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.023529, 0.023529, 0.043137, 1)
+
+[node name="Panel" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -110.0
+offset_right = 260.0
+offset_bottom = 110.0
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Panel"]
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.87, 1, 0.9)
+theme_override_font_sizes/font_size = 32
+text = ""
+
+[node name="Body" type="Label" parent="Panel"]
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.62, 0.65, 0.85, 0.8)
+text = ""
+
+[node name="Again" type="Button" parent="Panel"]
+text = "the dark, again"

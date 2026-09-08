@@ -34,13 +34,17 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R8 | Candle Rows (floor −2) + tutorialisation | todo | — | teaches Cling before the Walk |
 | R9 | Candle Rows (floor −2) + whispers | in_review | #50 | teaches Cling; diegetic tutorial |
 | R10 | The Prism Hall: mirrors + traced rays | in_review | #51 | turnable glass; floor +1 |
-| R11 | Title + save/progress + touch controls | in_review | — | phone-playable; descend where you left off |
-| R12 | The Lantern Keeper + dual ending | todo | — | boss + finale |
+| R11 | Title + save/progress + touch controls | in_review | #52 | phone-playable; descend where you left off |
+| R12 | The Lantern Room: Keeper + dual ending | in_review | — | the climb is completable end to end |
 | R13 | Title, audio, touch polish, ship | todo | — | deploy to Pages |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R12** — The climb has a top. The Great Lamp will not be
+  touched while its three feeders burn; the Keeper walks toward her the whole
+  time, slower than she is, carrying the last flame. Two endings, no score, and
+  the game never says which one was right.
 - **2026-09-08 · R11** — A way in and a way back: title screen, a save that
   remembers the deepest floor and what it cost, and floating-thumbstick touch
   controls so this is playable on a phone.

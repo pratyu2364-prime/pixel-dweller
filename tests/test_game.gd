@@ -19,7 +19,7 @@ func test_every_chamber_in_the_climb_exists_and_parses() -> void:
 
 func test_floors_follow_the_climb_order() -> void:
 	assert_eq(Game.next_after("cistern", ""), "candle_rows")
-	assert_eq(Game.next_after("prism_hall", ""), "", "the top of the stack ends the run")
+	assert_eq(Game.next_after("lantern_room", ""), "", "the top of the stack ends the run")
 
 
 func test_a_chamber_can_reroute_itself() -> void:
@@ -41,11 +41,12 @@ func test_entering_a_chamber_replaces_the_last_one() -> void:
 	assert_eq(chambers, 1, "only one floor is ever live")
 
 
-func test_the_last_floor_finishes_the_climb() -> void:
+func test_the_last_floor_ends_in_a_choice_not_a_score() -> void:
 	var game: Game = GAME.instantiate()
 	add_child_autofree(game)
-	game.enter("prism_hall")
+	game.enter("lantern_room")
 	watch_signals(game)
 	game.chamber.umbra.global_position = game.chamber.data.cell_to_world(game.chamber.data.exit)
 	game.chamber._process(0.016)
-	assert_signal_emitted(game, "climb_finished")
+	assert_signal_emitted_with_parameters(game, "ending_reached", ["rejoin"])
+	assert_true(game.progress.has_finished())

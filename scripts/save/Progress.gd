@@ -12,10 +12,17 @@ var reached: String = FIRST_CHAMBER  ## deepest floor entered; where Continue go
 var completed: Array[String] = []
 var scatters: int = 0
 var seconds_played: float = 0.0
+## Which endings she has seen. Both can be true: the game invites a second climb
+## rather than grading the first.
+var endings: Dictionary = {}
 
 
 func has_started() -> bool:
 	return reached != FIRST_CHAMBER or not completed.is_empty() or scatters > 0
+
+
+func has_finished() -> bool:
+	return not endings.is_empty()
 
 
 func is_complete(id: String) -> bool:
@@ -52,6 +59,7 @@ func to_dict() -> Dictionary:
 		"completed": completed,
 		"scatters": scatters,
 		"seconds_played": seconds_played,
+		"endings": endings.keys(),
 	}
 
 
@@ -62,6 +70,8 @@ static func from_dict(data: Dictionary) -> Progress:
 	progress.seconds_played = float(data.get("seconds_played", 0.0))
 	for id in data.get("completed", []):
 		progress.completed.append(String(id))
+	for kind in data.get("endings", []):
+		progress.endings[String(kind)] = true
 	return progress
 
 

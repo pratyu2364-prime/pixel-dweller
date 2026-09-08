@@ -10,6 +10,7 @@ extends Node2D
 
 signal exit_reached
 signal umbra_scattered(cell: Vector2i)
+signal ending_reached(kind: String)  ## "free" — the Lamp is out; "rejoin" — the stair
 
 const CELL := ChamberData.CELL_SIZE
 const INK_RADIUS := 2.2
@@ -27,6 +28,8 @@ var renderer: ChamberRenderer
 var wardens: Array[Warden] = []
 var movers: Array[MovingLight] = []
 var touch: TouchPad
+var keeper: Keeper
+var chain: LampChain
 var _whispers_said: Dictionary = {}
 
 var _exit_fired: bool = false
@@ -49,6 +52,8 @@ func load_chamber(path: String) -> void:
 	_spawn_renderer()
 	_spawn_umbra()
 	_spawn_wardens()
+	_spawn_chain()
+	_spawn_keeper()
 	_spawn_hud()
 
 
@@ -118,6 +123,40 @@ func _attach_camera() -> void:
 	camera.make_current()
 
 
+## The Great Lamp cannot be touched while its feeders burn, so the finale is
+## the game's own vocabulary at full size rather than a new mechanic.
+func _spawn_chain() -> void:
+	if data.chain.is_empty():
+		return
+	var great_id := data.light_id_at(data.chain["great"])
+	var feeders: Array[String] = []
+	for cell in data.chain["feeders"]:
+		var id := data.light_id_at(cell)
+		if not id.is_empty():
+			feeders.append(id)
+	if great_id.is_empty() or feeders.is_empty():
+		push_error("Chamber %s has a chain that points at no lights" % data.id)
+		return
+	chain = LampChain.new(field, cling, great_id, feeders, 1.0)
+	chain.extinguished.connect(func() -> void: _finish("free"))
+	chain.extinguishable.connect(func() -> void: hud.say("now. before he reaches you"))
+
+
+func _spawn_keeper() -> void:
+	if data.keeper_cell == Vector2i(-1, -1):
+		return
+	keeper = Keeper.new()
+	keeper.name = "Keeper"
+	add_child(keeper)
+	keeper.setup(field, data.keeper_cell)
+	keeper.reached_her.connect(_on_keeper_reached)
+
+
+func _on_keeper_reached() -> void:
+	# He does not strike her. He simply arrives, and where he stands is lit.
+	umbra.state.scatter()
+
+
 ## Wardens are spawned after Umbra so their lanterns light a room she is
 ## already standing in — no frame where the floor is dark by accident.
 func _spawn_wardens() -> void:
@@ -182,6 +221,8 @@ func _process(delta: float) -> void:
 		_update_hud()
 	if touch != null:
 		umbra.touch_direction = touch.direction
+	if keeper != null and umbra != null:
+		keeper.follow(umbra.current_cell())
 	_check_whispers()
 	if renderer != null:
 		renderer.advance(delta, ChamberRenderer.dread_for(umbra.state if umbra else null))
@@ -201,6 +242,8 @@ func _update_hud() -> void:
 	var target := cling.target_near(umbra.current_cell())
 	if target.is_empty():
 		hud.set_hint("")
+	elif cling.is_locked(target):
+		hud.set_hint("it will not go out while the three still burn")
 	elif cling.is_portable(target):
 		hud.set_hint("cling to lift the candle")
 	else:
@@ -227,4 +270,15 @@ func _check_exit() -> void:
 		return
 	if umbra.current_cell() == data.exit:
 		_exit_fired = true
-		exit_reached.emit()
+		if chain != null:
+			_finish("rejoin")
+		else:
+			exit_reached.emit()
+
+
+## The two ways this ends, and the game never says which is right.
+func _finish(kind: String) -> void:
+	_exit_fired = true
+	if umbra != null:
+		umbra.input_enabled = false
+	ending_reached.emit(kind)
