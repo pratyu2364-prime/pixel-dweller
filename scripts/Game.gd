@@ -7,13 +7,16 @@ extends Node2D
 
 signal chamber_entered(id: String)
 signal climb_finished
+signal ending_reached(kind: String)
 
 const CHAMBER_DIR := "res://chambers/"
 const FADE_SECONDS := 0.45
 
 ## The Sunken Observatory, cellar first. A chamber's own `next:` overrides this,
 ## so a floor can be rerouted without touching code.
-const DEFAULT_ORDER: Array[String] = ["cistern", "candle_rows", "orrery", "warden_walk", "prism_hall"]
+const DEFAULT_ORDER: Array[String] = [
+	"cistern", "candle_rows", "orrery", "warden_walk", "prism_hall", "lantern_room"
+]
 
 @export var start_chamber: String = "cistern"
 
@@ -74,9 +77,25 @@ func enter(id: String) -> void:
 	add_child(chamber)
 	chamber.exit_reached.connect(_on_exit_reached, CONNECT_ONE_SHOT)
 	chamber.umbra_scattered.connect(_on_scattered)
+	chamber.ending_reached.connect(_on_ending_reached, CONNECT_ONE_SHOT)
 	progress.enter(id, DEFAULT_ORDER)
 	progress.save()
 	chamber_entered.emit(id)
+
+
+## The climb has two endings and no score. Whichever she chooses, the run is
+## recorded as finished and the game says what she did.
+func _on_ending_reached(kind: String) -> void:
+	progress.complete(current_id)
+	progress.endings[kind] = true
+	progress.save()
+	ending_reached.emit(kind)
+	var ending: EndingScreen = load("res://scenes/Ending.tscn").instantiate()
+	var layer := CanvasLayer.new()
+	layer.layer = 20
+	add_child(layer)
+	layer.add_child(ending)
+	ending.show_ending(kind)
 
 
 func _on_scattered(_cell: Vector2i) -> void:

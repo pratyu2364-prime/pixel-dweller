@@ -109,4 +109,4 @@ func test_the_prism_hall_is_actually_crossed_by_light() -> void:
 
 func test_the_hall_stands_between_the_walk_and_the_top() -> void:
 	assert_eq(Game.next_after("warden_walk", ""), "prism_hall")
-	assert_eq(Game.next_after("prism_hall", ""), "")
+	assert_eq(Game.next_after("prism_hall", ""), "lantern_room")

@@ -12,6 +12,7 @@ const FLOOR_NAMES := {
 	"orrery": "−1 · The Orrery",
 	"warden_walk": "0 · Warden's Walk",
 	"prism_hall": "+1 · The Prism Hall",
+	"lantern_room": "+2 · The Lantern Room",
 }
 
 var progress: Progress
@@ -41,6 +42,10 @@ func refresh() -> void:
 static func subtitle_for(state: Progress) -> String:
 	if not state.has_started():
 		return ""
+	if state.has_finished():
+		if state.endings.size() > 1:
+			return "you have gone out, and you have gone back"
+		return "you snuffed the lamp" if state.endings.has("free") else "you went back to them"
 	var floor_name: String = FLOOR_NAMES.get(state.reached, state.reached)
 	if state.scatters == 0:
 		return "%s · never yet scattered" % floor_name
