@@ -59,7 +59,10 @@ It ends in a choice with no right answer, and the game does not grade it.
 
 ```bash
 godot --headless --path . --import
+# the fast suite — seconds
 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
+# the proofs — searches every chamber in space and time; a minute or two
+godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests/proofs -gexit
 ```
 
 `TRACKER.md` is the execution log; `docs/design/PENUMBRA.md` is the charter.

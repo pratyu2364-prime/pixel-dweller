@@ -9,6 +9,23 @@ env:
   GODOT_VERSION: "4.3"
 
 jobs:
+  proofs:
+    name: Chamber proofs (fairness + collectability)
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Import resources (registers GUT class_names)
+        run: timeout 180 godot --headless --import || true
+
+      # Proves, for every floor: there is a route that never stands in glare,
+      # its memory can be collected on a run that still finishes, and a bot can
+      # walk the proof with the real body.
+      - name: GUT proofs (headless)
+        run: timeout 900 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests/proofs -gexit
+
   test:
     name: Lint + Test + Export smoke
     runs-on: ubuntu-latest
@@ -28,13 +45,11 @@ jobs:
       - name: Import resources (registers GUT class_names)
         run: timeout 180 godot --headless --import || true
 
+      # tests/ is the fast suite (seconds). tests/proofs/ searches every chamber
+      # in space and time and runs as its own job, so a slow proof can never
+      # time out the build that also lints and exports.
       - name: GUT unit tests (headless)
-        run: |
-          if [ -d addons/gut ]; then
-            timeout 240 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
-          else
-            echo "GUT not present yet — skipping (Phase 0)."
-          fi
+        run: timeout 240 godot --headless --path . -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
 
       - name: Boot smoke (headless, N frames)
         run: |
