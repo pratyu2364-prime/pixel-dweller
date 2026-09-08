@@ -29,9 +29,27 @@ func _ready() -> void:
 	progress = Progress.load_from()
 	options = PlayerOptions.load_from()
 	_build_options_row()
+	_build_remembered()
 	_begin_button.pressed.connect(func() -> void: _start(Progress.FIRST_CHAMBER))
 	_continue_button.pressed.connect(func() -> void: _start(progress.reached))
 	refresh()
+
+
+## The page of remembered lines lives behind the title, not behind a pause menu,
+## because it is something you read between climbs rather than during one.
+func _build_remembered() -> void:
+	var page: RememberedScreen = load("res://scenes/Remembered.tscn").instantiate()
+	page.name = "Remembered"
+	page.visible = false
+	add_child(page)
+	var button := Button.new()
+	button.name = "RememberedButton"
+	button.text = "what you remember"
+	button.pressed.connect(func() -> void:
+		page.present(progress)
+		page.visible = true
+	)
+	$Menu.add_child(button)
 
 
 ## Three toggles, in the language of the game rather than of a settings menu.
