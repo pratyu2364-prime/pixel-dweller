@@ -42,6 +42,7 @@ var _memory_lines: Dictionary = {}  ## cell -> text, bound to glyphs after the m
 var whispers: Array[Dictionary] = []  ## {cell, radius, text}
 var keeper_cell: Vector2i = Vector2i(-1, -1)
 var chain: Dictionary = {}  ## {great: Vector2i, feeders: Array[Vector2i]}
+var tide_definition: Dictionary = {}
 var next_id: String = ""  ## the chamber this one leads to; empty ends the run
 var parse_errors: Array[String] = []
 
@@ -99,6 +100,8 @@ func _read_front_matter(line: String) -> void:
 			next_id = value
 		"warden":
 			_read_warden(value)
+		"tide":
+			_read_tide(value)
 		"keeper":
 			_read_keeper(value)
 		"chain":
@@ -158,6 +161,21 @@ func _read_warden(value: String) -> void:
 ## Teaching happens in the room, in her own voice, once — never in a tooltip
 ## and never in a menu the player has to be told to open.
 ## `ray: id=dawn cell=(1,9) dir=(1,0) range=34`
+func _read_tide(value: String) -> void:
+	var tide := Tide.from_tokens(value)
+	for error in tide["errors"]:
+		parse_errors.append(error)
+	tide_definition = tide
+
+
+func has_tide() -> bool:
+	return not tide_definition.is_empty()
+
+
+func build_tide() -> Tide:
+	return Tide.from_definition(tide_definition) if has_tide() else null
+
+
 func _read_keeper(value: String) -> void:
 	for token in value.split(" ", false):
 		var pair := String(token).split("=", true, 1)

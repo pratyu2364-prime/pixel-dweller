@@ -6,7 +6,7 @@ extends RefCounted
 ## inventory, no currency and no levels, so there is almost nothing to persist.
 
 const PATH := "user://penumbra.json"
-const FIRST_CHAMBER := "cistern"
+const FIRST_CHAMBER := "drowned_stair"
 
 var reached: String = FIRST_CHAMBER  ## deepest floor entered; where Continue goes
 var completed: Array[String] = []

@@ -29,6 +29,8 @@ var hud: Hud
 var renderer: ChamberRenderer
 var wardens: Array[Warden] = []
 var movers: Array[MovingLight] = []
+var tide: Tide
+var _tide_seconds: float = 0.0
 var touch: TouchPad
 var keeper: Keeper
 var chain: LampChain
@@ -58,6 +60,9 @@ func load_chamber(path: String) -> void:
 	cling = ClingController.new(field, data.lights)
 	for definition in data.movers:
 		movers.append(MovingLight.from_definition(definition))
+	tide = data.build_tide()
+	if tide != null:
+		tide.apply(field, 0.0)
 	_build_walls()
 	_spawn_renderer()
 	_spawn_umbra()
@@ -282,6 +287,9 @@ func _process(delta: float) -> void:
 	for mover in movers:
 		mover.advance(delta)
 		mover.apply(field)
+	if tide != null:
+		_tide_seconds += delta
+		tide.apply(field, _tide_seconds)
 	if umbra != null:
 		cling.tick(delta, umbra.current_cell(), umbra.is_clinging())
 		_update_hud()

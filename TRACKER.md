@@ -41,11 +41,15 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R15 | Presentation: name, floor cards, pause, shake | in_review | #56 | project is now PENUMBRA |
 | R16 | Memories: optional risk, permanent boons | in_review | #57 | one per floor, always in glare |
 | R17 | AutoPlayer + light perf: walk the proof | in_review | #58 | 20x faster static light |
-| R18 | Options: gentle, high contrast, still flames | in_review | — | plus renderer byte-buffer pass |
+| R18 | Options: gentle, high contrast, still flames | in_review | #59 | plus renderer byte-buffer pass |
+| R19 | The Drowned Stair: tides | in_review | — | floor −4; the room itself floods |
 | R8 | Legacy purge: delete the retired build | in_review | #49 | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R19** — The charter's unused idea, built: rooms whose ambient
+  light rises on a clock. The Drowned Stair (floor −4) is now the bottom of the
+  climb, and the prover extends its horizon to cover a whole tide.
 - **2026-09-08 · R18** — A game about being punished by light needs a way to
   turn the punishment down. Gentle mode, high contrast and still flames, saved
   beside progress — and the rooms, routes and endings stay identical.

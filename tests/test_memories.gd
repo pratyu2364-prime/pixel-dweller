@@ -31,11 +31,15 @@ func test_they_sit_in_the_light_with_shade_one_step_away() -> void:
 		var data := ChamberData.from_file(Game.path_for(id))
 		var field := data.build_field()
 		var cell: Vector2i = data.memories[0]["cell"]
+		# On a tide floor the risk arrives on a clock, so ask at high water.
+		if data.has_tide():
+			data.build_tide().apply(field, float(data.tide_definition["period"]) * 0.25)
 		assert_true(field.is_glare(cell), "%s: a memory you can stand on is not a choice" % id)
 		assert_true(data.reachable_floor().has(cell), "%s: unreachable memory" % id)
 		var escape := false
+		var refuge := data.build_field()
 		for offset in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
-			escape = escape or (not data.is_wall(cell + offset) and field.is_shade(cell + offset))
+			escape = escape or (not data.is_wall(cell + offset) and refuge.is_shade(cell + offset))
 		assert_true(escape, "%s: a memory with no way back out is a trap" % id)
 
 

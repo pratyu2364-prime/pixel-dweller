@@ -33,6 +33,11 @@ var _snapshots: Array[LightField] = []
 
 func _init(data: ChamberData, horizon: int = DEFAULT_HORIZON) -> void:
 	_data = data
+	# Snapshots wrap, so the horizon must cover a whole tide or the search would
+	# be reasoning about a cycle the room does not actually have.
+	if data.has_tide():
+		var cycle := int(ceil(float(data.tide_definition["period"]) / SLICE_SECONDS))
+		horizon = maxi(horizon, cycle)
 	_build_snapshots(horizon)
 	# Cheapest first: a route that pays for one crossing is a better answer
 	# about a room than a faster route that pays for six.
@@ -54,6 +59,9 @@ func _build_snapshots(horizon: int) -> void:
 		for mover in movers:
 			mover.advance(SLICE_SECONDS * float(slice))
 			mover.apply(field)
+		var tide := _data.build_tide()
+		if tide != null:
+			tide.apply(field, SLICE_SECONDS * float(slice))
 		_snapshots.append(field)
 
 
