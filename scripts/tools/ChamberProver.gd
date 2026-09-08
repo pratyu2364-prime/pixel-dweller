@@ -1,0 +1,135 @@
+class_name ChamberProver
+extends RefCounted
+
+## Proves a chamber is winnable *without ever standing in light*.
+##
+## Moving lights made hand-checking a floor impossible: a room that looks safe
+## can seal itself four seconds after you enter it. So instead of trusting a
+## designer's eye, this searches the room in space *and time* and answers one
+## question — is there a route from the spawn to the exit that never crosses
+## glare, given that beams sweep and lamps orbit?
+##
+## Ink is modelled too, because a lit crossing is legal when she has a puff to
+## throw: a step into glare costs a charge, and charges only return in deep
+## shade. That is exactly the game's own rule, so a route the prover finds is a
+## route a player could actually walk.
+
+const SLICE_SECONDS := 0.5
+const DEFAULT_HORIZON := 160  ## 80 seconds of simulated time
+const MAX_INK := 3
+const MAX_SPEND := 8  ## more crossings than this and the room is not a puzzle
+
+var reachable: bool = false
+var slices_taken: int = -1
+var ink_spent: int = 0
+var visited_states: int = 0
+
+var _data: ChamberData
+var _snapshots: Array[LightField] = []
+
+
+func _init(data: ChamberData, horizon: int = DEFAULT_HORIZON) -> void:
+	_data = data
+	_build_snapshots(horizon)
+	# Cheapest first: a route that pays for one crossing is a better answer
+	# about a room than a faster route that pays for six.
+	for budget in range(0, MAX_SPEND + 1):
+		_search(budget)
+		if reachable:
+			return
+
+
+## One light field per time slice, advanced exactly the way the live chamber
+## advances it. Snapshots are shared by every state at that instant, so the
+## search costs no more than the simulation does.
+func _build_snapshots(horizon: int) -> void:
+	for slice in horizon:
+		var field := _data.build_field()
+		var movers: Array[MovingLight] = []
+		for definition in _data.movers:
+			movers.append(MovingLight.from_definition(definition))
+		for mover in movers:
+			mover.advance(SLICE_SECONDS * float(slice))
+			mover.apply(field)
+		_snapshots.append(field)
+
+
+func snapshot(slice: int) -> LightField:
+	return _snapshots[slice % _snapshots.size()]
+
+
+func is_safe(cell: Vector2i, slice: int) -> bool:
+	return snapshot(slice).is_shade(cell)
+
+
+func is_deep(cell: Vector2i, slice: int) -> bool:
+	return snapshot(slice).is_deep_shade(cell)
+
+
+## Ink refills, so a state has to remember how many crossings it has paid for
+## as well as what it is carrying — otherwise a route that spends three charges
+## and recharges reads as free.
+func _key(cell: Vector2i, slice: int, ink: int, spent: int) -> int:
+	var wrapped := slice % _snapshots.size()
+	var place := (cell.y * _data.width + cell.x) * _snapshots.size() + wrapped
+	return (place * (MAX_INK + 1) + ink) * (MAX_SPEND + 1) + spent
+
+
+## Breadth-first over (cell, time, ink). Every edge is one time slice, so the
+## first time the exit is reached is also the fastest safe route.
+func _search(budget: int) -> void:
+	if not _data.is_valid():
+		return
+	var start := _data.spawn
+	var queue: Array = [[start, 0, MAX_INK, 0]]
+	var seen := {_key(start, 0, MAX_INK, 0): true}
+	var head := 0
+	while head < queue.size():
+		var state: Array = queue[head]
+		head += 1
+		var cell: Vector2i = state[0]
+		var slice: int = state[1]
+		var ink: int = state[2]
+		var spent: int = state[3]
+		if cell == _data.exit:
+			reachable = true
+			slices_taken = slice
+			ink_spent = spent
+			visited_states = seen.size()
+			return
+		if slice >= _snapshots.size() * 2:
+			continue
+		var next_slice := slice + 1
+		for offset in [Vector2i.ZERO, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			var next: Vector2i = cell + offset
+			if not _data.in_bounds(next) or _data.is_wall(next):
+				continue
+			var next_ink := ink
+			var next_spent := spent
+			if not is_safe(next, next_slice):
+				# Crossing light is legal only with a puff to throw.
+				if next_ink <= 0 or next_spent >= budget:
+					continue
+				next_ink -= 1
+				next_spent += 1
+			elif is_deep(next, next_slice) and next_ink < MAX_INK:
+				next_ink += 1
+			var key := _key(next, next_slice, next_ink, next_spent)
+			if seen.has(key):
+				continue
+			seen[key] = true
+			queue.append([next, next_slice, next_ink, next_spent])
+	visited_states = seen.size()
+
+
+func seconds_taken() -> float:
+	return float(slices_taken) * SLICE_SECONDS
+
+
+func report() -> String:
+	if not reachable:
+		return "%s: NO SAFE ROUTE (searched %d states)" % [_data.id, visited_states]
+	return (
+		"%s: safe route in %.1fs, %d crossings paid for (%d states)"
+		% [_data.id, seconds_taken(), ink_spent, visited_states]
+	)
