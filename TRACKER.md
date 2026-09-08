@@ -29,17 +29,20 @@ revamp: PENUMBRA          # total rewrite; legacy life-sim/combat build retired
 | R3 | Chamber format + loader (ASCII → room) | done | #44 | The Cistern playable |
 | R4 | Cling + HUD | done | #45 | carry candles, smother braziers |
 | R5 | Renderer: shader-driven look, Umbra as a hole | done | #46 | field → texture → palette |
-| R6 | Wardens + chamber progression | in_review | #47 | Warden's Walk; Game sequence |
-| R7 | The Orrery: orbiting lamps + sweeping beam | in_review | — | beams in LightField; floor −1 |
+| R6 | Wardens + chamber progression | done | #47 | Warden's Walk; Game sequence |
+| R7 | The Orrery: orbiting lamps + sweeping beam | in_review | #48 | beams in LightField; floor −1 |
 | R8 | Candle Rows (floor −2) + tutorialisation | todo | — | teaches Cling before the Walk |
 | R9 | The Prism Hall: mirrors + refraction | todo | — | hardest puzzle floor |
 | R10 | Progression, save, chamber select, memories | todo | — | permanent ink/coherence upgrades |
 | R11 | The Lantern Keeper + dual ending | todo | — | boss + finale |
 | R12 | Title, tutorialisation, audio, touch polish, ship | todo | — | deploy to Pages |
-| R13 | Legacy purge: delete retired life-sim/combat code | todo | — | after R2/R3 cover the ground |
+| R8 | Legacy purge: delete the retired build | in_review | — | 22 scripts, 9 scenes, 23 tests gone |
 
 ## Log
 
+- **2026-09-08 · R8** — The old game is gone: Dweller, Stats, needs decay, life
+  stages, NPCs, districts, shops, sword combat, slimes, the city map and every
+  test that guarded them. What is left is PENUMBRA and nothing else.
 - **2026-09-08 · R7** — Light that will not hold still. Beam cones in the
   LightField, orbiting lamps and a sweeping eye declared in front matter, and
   The Orrery (floor −1) built around them. Everything is a function of time, so
