@@ -10,6 +10,8 @@ extends CharacterBody2D
 signal scattered_at(cell: Vector2i)
 signal reformed_at(cell: Vector2i)
 signal cast_requested(cell: Vector2i)
+signal cling_pressed(cell: Vector2i)
+signal cling_released
 
 const BASE_SPEED := 92.0
 const ACCELERATION := 900.0
@@ -69,6 +71,10 @@ func _read_input() -> Vector2:
 	return Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
 
+func is_clinging() -> bool:
+	return input_enabled and Input.is_action_pressed("cling")
+
+
 func _apply_motion(delta: float, direction: Vector2) -> void:
 	var target := direction * BASE_SPEED * state.speed_multiplier(glare())
 	if direction == Vector2.ZERO:
@@ -90,6 +96,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("cast"):
 		try_cast()
+	elif event.is_action_pressed("cling"):
+		cling_pressed.emit(current_cell())
+	elif event.is_action_released("cling"):
+		cling_released.emit()
 
 
 ## Casting is announced, not resolved here: the chamber owns the LightField and

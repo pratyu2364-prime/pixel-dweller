@@ -21,6 +21,8 @@ const UMBRA_SCENE := preload("res://scenes/Umbra.tscn")
 var data: ChamberData
 var field: LightField
 var umbra: Umbra
+var cling: ClingController
+var hud: Hud
 
 var _exit_fired: bool = false
 
@@ -35,8 +37,10 @@ func load_chamber(path: String) -> void:
 		push_error("Chamber %s failed to parse: %s" % [path, ", ".join(data.parse_errors)])
 		return
 	field = data.build_field()
+	cling = ClingController.new(field, data.lights)
 	_build_walls()
 	_spawn_umbra()
+	_spawn_hud()
 	queue_redraw()
 
 
@@ -74,6 +78,8 @@ func _spawn_umbra() -> void:
 	umbra.bind_field(field, CELL)
 	umbra.global_position = data.cell_to_world(data.spawn)
 	umbra.cast_requested.connect(_on_cast_requested)
+	umbra.cling_pressed.connect(_on_cling_pressed)
+	umbra.cling_released.connect(cling.release_press)
 	_attach_camera()
 	umbra.scattered_at.connect(func(cell: Vector2i) -> void: umbra_scattered.emit(cell))
 
@@ -95,6 +101,19 @@ func _attach_camera() -> void:
 	camera.make_current()
 
 
+const HUD_SCENE := preload("res://scenes/Hud.tscn")
+
+
+func _spawn_hud() -> void:
+	hud = HUD_SCENE.instantiate()
+	add_child(hud)
+	hud.bind(umbra.state)
+
+
+func _on_cling_pressed(cell: Vector2i) -> void:
+	cling.press(cell)
+
+
 func _on_cast_requested(cell: Vector2i) -> void:
 	field.cast_ink(cell, INK_RADIUS, 1.0, INK_LIFE)
 	queue_redraw()
@@ -104,8 +123,30 @@ func _process(delta: float) -> void:
 	if field == null:
 		return
 	field.advance(delta)
+	if umbra != null:
+		cling.tick(delta, umbra.current_cell(), umbra.is_clinging())
+		_update_hud()
 	_check_exit()
 	queue_redraw()
+
+
+## The only text the game ever shows during play: what this light will do if you
+## reach for it.
+func _update_hud() -> void:
+	if hud == null:
+		return
+	hud.set_glare(umbra.glare())
+	hud.set_smother(cling.smother_fraction())
+	if cling.is_holding():
+		hud.set_hint("carrying a candle — cling to set it down")
+		return
+	var target := cling.target_near(umbra.current_cell())
+	if target.is_empty():
+		hud.set_hint("")
+	elif cling.is_portable(target):
+		hud.set_hint("cling to lift the candle")
+	else:
+		hud.set_hint("hold cling to smother it")
 
 
 func _check_exit() -> void:
